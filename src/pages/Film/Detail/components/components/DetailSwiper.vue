@@ -1,0 +1,24 @@
+<template>
+  <div class="swiper-container">
+    <ul class="swiper-wrapper" style="padding-left: 15px">
+      <slot></slot>
+    </ul>
+  </div>
+</template>
+<script>
+import "swiper/swiper-bundle.min.css";
+import Swiper, { Navigation, Pagination, Autoplay } from "swiper";
+Swiper.use([Navigation, Pagination, Autoplay]);
+export default {
+  name: "DetailSwiper",
+  props: ["perview", "myclass"],
+  mounted() {
+    /* eslint-disable no-new */
+    new Swiper("." + this.myclass, {
+      slidesPerView: this.perview,
+      spaceBetween: 10
+    });
+  }
+};
+</script>
+<style scoped lang="less"></style>
