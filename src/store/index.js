@@ -14,7 +14,11 @@ export default new Vuex.Store({
       type: 1
     },
     film_detail: {},
-    is_show_tabs: true
+    is_show_tabs: true,
+    cinemas_params: {
+      cityId: 510100,
+      ticketFlag: 1
+    }
   },
   mutations: {
     setFilmList(state, data) {
@@ -43,6 +47,9 @@ export default new Vuex.Store({
     },
     setTabs(state, data) {
       state.is_show_tabs = data;
+    },
+    setCinemasParams(state, data) {
+      state.cinemas_params = { ...state.cinemas_params, ...data };
     }
   },
   actions: {

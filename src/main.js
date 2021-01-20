@@ -5,11 +5,13 @@ import store from "./store";
 import Vant from "vant";
 import "vant/lib/index.css";
 import { Toast } from "vant";
+import axios from "axios";
 
 Vue.config.productionTip = false;
 Vue.use(Vant);
 Vue.use(Toast);
 Vue.prototype.$Toast = Toast;
+Vue.prototype.$axios = axios;
 
 new Vue({
   router,

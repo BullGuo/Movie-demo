@@ -35,8 +35,29 @@ const routes = [
       },
       {
         path: "cinemas",
-        name: "cinemas",
-        component: () => import("../pages/Cinemas/indexAction")
+        component: () => import("../pages/Cinemas/indexAction"),
+        children: [
+          {
+            path: "",
+            name: "cinemas",
+            component: () => import("../pages/Cinemas/Cinemas/indexAction"),
+            children: [
+              {
+                path: ":cinemaId",
+                name: "cinemas_detail",
+                // props: true,
+                component: () =>
+                  import("../pages/Cinemas/Cinemas/CinemasDetail/indexAction")
+              }
+            ]
+          },
+          {
+            path: "search",
+            name: "search",
+            component: () =>
+              import("../pages/Cinemas/CinemasSearch/indexAction")
+          }
+        ]
       },
       {
         path: "my_center",

@@ -1,25 +1,25 @@
 <template>
   <div class="photos">
-    <div class="photos-title-bar" @click="photosAllClick">
+    <div class="photos-title-bar">
       <span class="photos-title-text">剧照</span>
-      <span class="photos-to-all"
+      <span class="photos-to-all" @click="photosAllClick"
         >全部({{ $store.state.film_detail.photos.length }})<van-icon
           name="arrow"
-          style="vertical-align: middle;"
+          class="photos-to-all-icon"
         />
       </span>
     </div>
     <detail-swiper
-      perview="3"
-      class="actorswiper"
-      myclass="actorswiper"
+      perview="2.4"
+      class="photoswiper"
+      my-class="photoswiper"
       style="height: 140px"
     >
       <li
         class="swiper-slide"
         v-for="(data, index) in $store.state.film_detail.photos"
         :key="index"
-        style="width: 150px;min-width: 150px"
+        style="width: 150px !important;"
       >
         <div class="swiper-photos">
           <img class="swiper-photos-photo" :src="data" />
@@ -32,9 +32,15 @@
 <script>
 export default {
   name: "StagePhoto",
+  props: {
+    showStagePhoto: {
+      type: Boolean,
+      default: false
+    }
+  },
   methods: {
     photosAllClick() {
-      console.log(11111111111111);
+      this.$emit("update:showStagePhoto", true);
     }
   },
   components: {
@@ -66,6 +72,10 @@ export default {
       font-size: 13px;
       color: #797d82;
       float: right;
+      .photos-to-all-icon {
+        position: relative;
+        top: 2px;
+      }
     }
   }
   .photos-name {

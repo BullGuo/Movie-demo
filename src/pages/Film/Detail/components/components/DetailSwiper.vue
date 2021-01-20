@@ -1,7 +1,7 @@
 <template>
   <div class="swiper-container">
     <ul class="swiper-wrapper" style="padding-left: 15px">
-      <slot></slot>
+      <slot />
     </ul>
   </div>
 </template>
@@ -11,10 +11,10 @@ import Swiper, { Navigation, Pagination, Autoplay } from "swiper";
 Swiper.use([Navigation, Pagination, Autoplay]);
 export default {
   name: "DetailSwiper",
-  props: ["perview", "myclass"],
+  props: ["perview", "myClass"],
   mounted() {
     /* eslint-disable no-new */
-    new Swiper("." + this.myclass, {
+    new Swiper("." + this.myClass, {
       slidesPerView: this.perview,
       spaceBetween: 10
     });

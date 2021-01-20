@@ -1,9 +1,4 @@
 <template>
-  <!--  <van-pull-refresh-->
-  <!--    style="height: calc(100% - 44px);"-->
-  <!--    v-model="isLoading"-->
-  <!--    @refresh="onRefresh"-->
-  <!--  >-->
   <div style="height: calc(100% - 44px)">
     <van-pull-refresh
       class="comingClass"
@@ -14,9 +9,9 @@
       <film-list button_text="预购" />
       <div
         v-if="
-          this.$store.state.film_list_total &&
-            Math.ceil(this.$store.state.film_list_total / 10) <
-              this.$store.state.params.pageNum
+          $store.state.film_list_total &&
+            Math.ceil($store.state.film_list_total / 10) <
+              $store.state.params.pageNum
         "
         :class="$store.state.film_list.length < 5 ? 'no-more-text' : 'no-more'"
       >
@@ -24,7 +19,6 @@
       </div>
     </van-pull-refresh>
   </div>
-  <!--  </van-pull-refresh>-->
 </template>
 
 <script>

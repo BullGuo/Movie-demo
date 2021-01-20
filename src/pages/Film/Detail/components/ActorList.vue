@@ -6,14 +6,14 @@
     <detail-swiper
       perview="4"
       class="actorswiper"
-      myclass="actorswiper"
+      my-class="actorswiper"
       style="height: 140px"
     >
       <li
         class="swiper-slide"
         v-for="data in $store.state.film_detail.actors"
         :key="data.name"
-        style="width: 85px;min-width: 85px"
+        style="width: 85px !important;"
       >
         <div style="width: 85px;height: 85px;position: relative">
           <img

@@ -1,21 +1,21 @@
 <template>
   <div>
-    <van-sticky>
-      <van-tabs
-        v-model="active"
-        swipeable
-        animated
-        border
-        color="#ff5f16"
-        line-height="2px"
-        line-width="56px"
-        title-active-color="#ff5f16"
-        v-if="$store.state.is_show_tabs"
-      >
-        <van-tab title="正在热映" to="/menu/film/nowPlaying" />
-        <van-tab title="即将上映" to="/menu/film/comingSoon" />
-      </van-tabs>
-    </van-sticky>
+    <!--    <van-sticky>-->
+    <van-tabs
+      v-model="active"
+      swipeable
+      animated
+      border
+      color="#ff5f16"
+      line-height="2px"
+      line-width="56px"
+      title-active-color="#ff5f16"
+      v-if="$store.state.is_show_tabs"
+    >
+      <van-tab title="正在热映" to="/menu/film/nowPlaying" />
+      <van-tab title="即将上映" to="/menu/film/comingSoon" />
+    </van-tabs>
+    <!--    </van-sticky>-->
     <router-view />
   </div>
 </template>

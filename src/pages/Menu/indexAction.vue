@@ -1,7 +1,7 @@
 <template>
   <div>
     <van-tabbar
-      v-model="active"
+      v-model="getActive"
       active-color="#ff5f16"
       v-if="$store.state.is_show_tabs"
     >
@@ -26,10 +26,16 @@
 <script>
 export default {
   name: "indexAction",
-  data() {
-    return {
-      active: 0
-    };
+  computed: {
+    getActive: {
+      get() {
+        let name = this.$route.name;
+        return name == "nowPlaying" ? 0 : name == "cinemas" ? 1 : 2;
+      },
+      set(value) {
+        return value;
+      }
+    }
   }
 };
 </script>

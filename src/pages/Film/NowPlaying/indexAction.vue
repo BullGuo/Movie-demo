@@ -8,9 +8,9 @@
       <film-list />
       <div
         v-if="
-          this.$store.state.film_list_total &&
-            Math.ceil(this.$store.state.film_list_total / 10) <
-              this.$store.state.params.pageNum
+          $store.state.film_list_total &&
+            Math.ceil($store.state.film_list_total / 10) <
+              $store.state.params.pageNum
         "
         :class="$store.state.film_list.length < 5 ? 'no-more-text' : 'no-more'"
       >

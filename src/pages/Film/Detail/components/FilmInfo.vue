@@ -105,7 +105,7 @@ export default {
   .grey-text {
     font-size: 13px;
     color: #797d82;
-    margin-top: 4px;
+    margin-top: 6px;
   }
   .hide {
     overflow: hidden;
