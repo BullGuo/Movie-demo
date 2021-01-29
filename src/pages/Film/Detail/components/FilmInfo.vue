@@ -15,7 +15,7 @@
     <div class="grey-text">
       {{ dataDetail.nation }} | {{ dataDetail.runtime }}分钟
     </div>
-    <div class="grey-text hide" :style="'height:' + (is_up ? 'auto' : '37px')">
+    <div class="grey-text hide">
       {{ dataDetail.synopsis }}
     </div>
     <div class="toggle">
@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import $ from "jquery";
 export default {
   name: "FilmInfo",
   data() {
@@ -55,7 +56,15 @@ export default {
   },
   methods: {
     iconClick() {
+      let el = $(".film-detail .hide");
       this.is_up = !this.is_up;
+      if (this.is_up) {
+        let nowHeight = el.height();
+        let autoHeight = el.css("height", "auto").height();
+        el.height(nowHeight).animate({ height: autoHeight }, 500);
+        return;
+      }
+      el.animate({ height: 37 }, 500);
     }
   }
 };
@@ -109,6 +118,7 @@ export default {
   }
   .hide {
     overflow: hidden;
+    height: 37px;
   }
   .toggle {
     text-align: center;

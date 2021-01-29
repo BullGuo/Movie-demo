@@ -67,6 +67,16 @@ const routes = [
     ]
   },
   {
+    path: "/login",
+    name: "login",
+    component: () => import("../pages/Login/indexAction")
+  },
+  {
+    path: "/city",
+    name: "city",
+    component: () => import("../pages/City/indexAction")
+  },
+  {
     path: "*",
     redirect: "/menu"
   }

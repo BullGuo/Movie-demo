@@ -75,9 +75,14 @@ export default {
   },
   created() {
     this.$store.commit("setTabs", false);
+    let state = this.$store.state;
+    let params = {
+      ...state.cinemas_params,
+      ...{ cityId: state.cityInfo.cityID || state.cityInfo.cityId }
+    };
     this.$axios({
       url: `https://m.maizuo.com/gateway?k=3631575`,
-      params: { ...this.$store.state.cinemas_params },
+      params: { ...params },
       headers: {
         "X-Client-Info":
           '{"a":"3000","ch":"1002","v":"5.0.4","e":"16092348011945091904110593","bc":"110100"}',

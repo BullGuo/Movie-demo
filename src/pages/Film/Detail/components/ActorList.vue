@@ -57,12 +57,18 @@ export default {
     color: #191a1b;
     width: 85px;
     height: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .actors-role {
     display: block;
     text-align: center;
     font-size: 10px;
     color: #797d82;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 </style>

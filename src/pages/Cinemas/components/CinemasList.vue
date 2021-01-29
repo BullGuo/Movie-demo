@@ -39,7 +39,12 @@ export default {
   },
   methods: {
     init() {
-      let params = { ...this.getParams };
+      let store = this.$store.state.cityInfo;
+      let params = {
+        ...this.getParams,
+        ...{ cityId: store.cityID || store.cityId }
+      };
+      console.log(store);
       this.getCinemasList(params);
     },
     getCinemasList(params) {

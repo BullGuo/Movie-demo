@@ -20,6 +20,7 @@
         v-for="(data, index) in $store.state.film_detail.photos"
         :key="index"
         style="width: 150px !important;"
+        @click="previewImg(index)"
       >
         <div class="swiper-photos">
           <img class="swiper-photos-photo" :src="data" />
@@ -30,6 +31,7 @@
 </template>
 
 <script>
+import { ImagePreview } from "vant";
 export default {
   name: "StagePhoto",
   props: {
@@ -41,6 +43,14 @@ export default {
   methods: {
     photosAllClick() {
       this.$emit("update:showStagePhoto", true);
+    },
+    previewImg(index) {
+      ImagePreview({
+        images: this.$store.state.film_detail.photos,
+        startPosition: index,
+        closeable: true,
+        closeIconPosition: "top-left"
+      });
     }
   },
   components: {
@@ -98,6 +108,7 @@ export default {
     height: 100px;
     .swiper-photos-photo {
       width: 100%;
+      height: 100%;
     }
   }
 }

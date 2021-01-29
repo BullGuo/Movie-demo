@@ -30,11 +30,23 @@ export default {
     getActive: {
       get() {
         let name = this.$route.name;
-        return name == "nowPlaying" ? 0 : name == "cinemas" ? 1 : 2;
+        return name == "nowPlaying"
+          ? 0
+          : name == "comingSoon"
+          ? 0
+          : name == "cinemas"
+          ? 1
+          : 2;
       },
       set(value) {
         return value;
       }
+    }
+  },
+  created() {
+    let city = this.$store.state.cityInfo;
+    if (!city.cityId && !city.name) {
+      this.$router.push({ name: "city" });
     }
   }
 };

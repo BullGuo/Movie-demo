@@ -1,8 +1,8 @@
 <template>
   <div class="cinemas-top-filter">
     <div class="header">
-      <div class="header-left">
-        <span>成都</span>
+      <div class="header-left" @click="getCity">
+        <span>{{ cityName }}</span>
         <img src="../img/city-icon.png" alt="" />
       </div>
       <div class="header-title">影院</div>
@@ -67,7 +67,8 @@ export default {
       option3: [
         { text: "最近去过", value: 1 },
         { text: "离我最近", value: 2 }
-      ]
+      ],
+      cityName: this.$store.state.cityInfo.name
     };
   },
   created() {
@@ -77,7 +78,7 @@ export default {
     handleOpen() {
       if (this.list.length == 1) {
         let params = {
-          keywords: "成都",
+          keywords: this.cityName,
           subdistrict: 1, // 子级行政区级数
           page: 1
         };
@@ -107,6 +108,10 @@ export default {
     },
     goSearch() {
       this.$router.push({ name: "search" });
+    },
+    // 跳转城市
+    getCity() {
+      this.$router.push({ name: "city" });
     }
   }
 };
@@ -148,6 +153,7 @@ export default {
     .header-title {
       flex-grow: 1;
       text-align: center;
+      padding-right: 21px;
     }
     &:after {
       content: "";

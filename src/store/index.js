@@ -9,16 +9,15 @@ export default new Vuex.Store({
     film_list: [],
     film_list_total: 0,
     params: {
-      cityId: 510100,
       pageNum: 1,
       type: 1
     },
     film_detail: {},
     is_show_tabs: true,
     cinemas_params: {
-      cityId: 510100,
       ticketFlag: 1
-    }
+    },
+    cityInfo: {}
   },
   mutations: {
     setFilmList(state, data) {
@@ -50,18 +49,22 @@ export default new Vuex.Store({
     },
     setCinemasParams(state, data) {
       state.cinemas_params = { ...state.cinemas_params, ...data };
+    },
+    setCityInfo(state, data) {
+      state.cityInfo = { ...state.cityInfo, ...data };
     }
   },
   actions: {
     getFilmList(store) {
+      let pageNum = store.state.params.pageNum;
       if (
         store.state.film_list_total &&
-        Math.ceil(store.state.film_list_total / 10) < store.state.params.pageNum
+        Math.ceil(store.state.film_list_total / 10) < pageNum
       )
         return;
+      let cityId = store.state.cityInfo.cityID || store.state.cityInfo.cityId;
       return axios({
-        url: `https://m.maizuo.com/gateway?cityId=510100&pageNum=${store.state
-          .params.pageNum++}&pageSize=10&type=${
+        url: `https://m.maizuo.com/gateway?cityId=${cityId}&pageNum=${pageNum++}&pageSize=10&type=${
           store.state.params.type
         }&k=9323250`,
         headers: {
