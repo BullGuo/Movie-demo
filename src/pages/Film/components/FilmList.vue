@@ -61,7 +61,7 @@ export default {
     padding: 15px;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #ededed;
+    position: relative;
     .nowPlayingFilm-info {
       width: calc(100% - 116px);
       padding: 0 10px;
@@ -104,6 +104,16 @@ export default {
     }
     button {
       height: 25px;
+    }
+    &:after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 1px;
+      width: 100%;
+      border-bottom: 1px solid #ededed;
+      transform: scaleY(0.5);
     }
   }
 }
