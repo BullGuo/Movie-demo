@@ -45,7 +45,7 @@ const routes = [
               {
                 path: ":cinemaId",
                 name: "cinemas_detail",
-                // props: true,
+                props: true,
                 component: () =>
                   import("../pages/Cinemas/Cinemas/CinemasDetail/indexAction")
               }

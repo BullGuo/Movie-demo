@@ -1,0 +1,9 @@
+* {
+  box-sizing: border-box;
+}
+body,
+button,
+input,
+textarea {
+  font: 12px/1.5 Tahoma, Helvetica, Arial, sans-serif;
+}

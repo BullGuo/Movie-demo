@@ -44,7 +44,6 @@ export default {
         ...this.getParams,
         ...{ cityId: store.cityID || store.cityId }
       };
-      console.log(store);
       this.getCinemasList(params);
     },
     getCinemasList(params) {

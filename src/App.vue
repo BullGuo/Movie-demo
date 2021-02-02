@@ -5,6 +5,7 @@
 </template>
 
 <style lang="less">
+@import "./common/assets/css/base.css";
 * {
   margin: 0;
   padding: 0;
