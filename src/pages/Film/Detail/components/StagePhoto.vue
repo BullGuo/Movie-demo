@@ -3,10 +3,10 @@
     <div class="photos-title-bar">
       <span class="photos-title-text">剧照</span>
       <span class="photos-to-all" @click="photosAllClick"
-        >全部({{ $store.state.film_detail.photos.length }})<van-icon
-          name="arrow"
-          class="photos-to-all-icon"
-        />
+        >全部({{
+          $store.state.film_detail.photos &&
+            $store.state.film_detail.photos.length
+        }})<van-icon name="arrow" class="photos-to-all-icon" />
       </span>
     </div>
     <detail-swiper

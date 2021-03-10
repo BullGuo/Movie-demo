@@ -11,8 +11,8 @@
           <span class="name">{{ data.name }}</span>
           <span class="item">{{ data.filmType.name }}</span>
         </div>
-        <div class="film-grade">
-          <span v-if="data.grade" class="info-col">观众评分 </span>
+        <div class="film-grade" v-if="data.grade">
+          <span class="info-col">观众评分 </span>
           <span class="grade">{{ data.grade }}</span>
         </div>
         <div class="van-ellipsis info-col">
@@ -20,7 +20,12 @@
         </div>
         <div class="info-col">{{ data.nation }} | {{ data.runtime }}分钟</div>
       </div>
-      <van-button plain color="#ff5f16" size="small">
+      <van-button
+        plain
+        :color="button_text == '购票' ? '#ff5f16' : '#ffb232'"
+        size="small"
+        v-if="data.isPresale"
+      >
         {{ button_text }}
       </van-button>
     </li>

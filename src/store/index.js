@@ -7,15 +7,16 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     film_list: [],
-    film_list_total: 0,
+    film_list_total: 0, // 电影列表总数
+    //电影列表参数
     params: {
       pageNum: 1,
       type: 1
     },
-    film_detail: {},
-    is_show_tabs: true,
+    film_detail: {}, // 电影详情
+    is_show_tabs: true, // 控制显示tabs
     cinemas_params: {
-      ticketFlag: 1
+      ticketFlag: 1 // 影院顶部筛选   APP兑换与前台兑换
     },
     cityInfo: {}
   },
@@ -26,7 +27,10 @@ export default new Vuex.Store({
         state.film_list_total = 0;
         return;
       }
-      state.film_list = [...state.film_list, ...data.films];
+      state.film_list =
+        state.params.pageNum == 1
+          ? [...data.films]
+          : [...state.film_list, ...data.films];
       let arr = state.film_list;
       for (let i = 0; i < arr.length - 1; i++) {
         for (let j = i + 1; j < arr.length; j++) {
@@ -55,6 +59,7 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    // 电影列表
     getFilmList(store) {
       let pageNum = store.state.params.pageNum;
       if (
@@ -64,9 +69,14 @@ export default new Vuex.Store({
         return;
       let cityId = store.state.cityInfo.cityID || store.state.cityInfo.cityId;
       return axios({
-        url: `https://m.maizuo.com/gateway?cityId=${cityId}&pageNum=${pageNum++}&pageSize=10&type=${
-          store.state.params.type
-        }&k=9323250`,
+        url: "https://m.maizuo.com/gateway",
+        params: {
+          cityId: cityId,
+          pageNum: pageNum,
+          pageSize: 10,
+          type: store.state.params.type,
+          k: 9323250
+        },
         headers: {
           "X-Client-Info":
             '{"a":"3000","ch":"1002","v":"5.0.4","e":"16092348011945091904110593","bc":"510100"}',
@@ -78,6 +88,7 @@ export default new Vuex.Store({
         }
       });
     },
+    // 电影详情
     getFilmDetail(store, id) {
       if (
         store.state.film_list_total &&
@@ -85,10 +96,11 @@ export default new Vuex.Store({
       )
         return;
       return axios({
-        url: `https://m.maizuo.com/gateway?filmId=${id}&k=371006`,
+        url: "https://m.maizuo.com/gateway",
+        params: { filmId: id, k: 371006 },
         headers: {
           "X-Client-Info":
-            '{"a":"3000","ch":"1002","v":"5.0.4","e":"16092348011945091904110593","bc":"110100"}',
+            '{"a":"3000","ch":"1002","v":"5.0.4","e":"16092348011945091904110593","bc":"510100"}',
           "X-Host": "mall.film-ticket.film.info"
         }
       }).then(res => {

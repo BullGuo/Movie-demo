@@ -23,19 +23,21 @@
 <script>
 export default {
   name: "indexAction",
-  data() {
-    return {
-      active: this.$route.name == "nowPlaying" ? 0 : 1
-    };
+  computed: {
+    active: {
+      get() {
+        return this.$route.name == "nowPlaying" ? 0 : 1;
+      },
+      set(value) {
+        return value;
+      }
+    }
   },
   watch: {
     active: {
       immediate: true,
       handler(val) {
-        let params = { type: 1, pageNum: 1 };
-        if (val == 1) {
-          params = { type: 2, pageNum: 1 };
-        }
+        let params = { type: val == 1 ? 2 : 1, pageNum: 1 };
         this.$store.commit("setParams", params);
         this.$store.commit("setFilmList", {
           films: [],

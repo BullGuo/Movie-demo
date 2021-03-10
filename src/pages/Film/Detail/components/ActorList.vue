@@ -11,11 +11,11 @@
     >
       <li
         class="swiper-slide"
-        v-for="data in $store.state.film_detail.actors"
-        :key="data.name"
+        v-for="(data, index) in $store.state.film_detail.actors"
+        :key="index"
         style="width: 85px !important;"
       >
-        <div style="width: 85px;height: 85px;position: relative">
+        <div style="width: 85px;height: 85px;position: relative;">
           <img
             style="width: 100%;position: absolute; transform: translateY(-25%)"
             :src="data.avatarAddress"
@@ -60,6 +60,7 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    box-sizing: content-box;
   }
   .actors-role {
     display: block;

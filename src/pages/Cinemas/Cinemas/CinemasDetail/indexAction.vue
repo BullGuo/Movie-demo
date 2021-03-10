@@ -29,7 +29,7 @@ export default {
       detail: {}
     };
   },
-  created() {
+  mounted() {
     this.$store.commit("setTabs", false);
     this.init();
   },

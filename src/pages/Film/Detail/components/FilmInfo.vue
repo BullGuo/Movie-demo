@@ -5,7 +5,7 @@
         <span class="name">{{ dataDetail.name }}</span>
         <span class="item">{{ dataDetail.filmType.name }}</span>
       </div>
-      <div class="film-grade">
+      <div class="film-grade" v-if="dataDetail.grade">
         <span class="grade">{{ dataDetail.grade }}</span>
         <span class="grade-text">分</span>
       </div>

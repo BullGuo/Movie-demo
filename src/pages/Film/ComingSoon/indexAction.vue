@@ -34,9 +34,11 @@ export default {
   },
   methods: {
     handleScroll(e) {
-      console.log(11111111111111);
       let target = e.target;
       if (target.scrollTop + target.clientHeight == target.scrollHeight) {
+        this.$store.commit("setParams", {
+          pageNum: this.$store.state.params.pageNum + 1
+        });
         this.$store.dispatch("getFilmList");
       }
     },
