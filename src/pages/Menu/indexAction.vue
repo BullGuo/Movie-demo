@@ -15,11 +15,13 @@
         >我的</van-tabbar-item
       >
     </van-tabbar>
-    <router-view
-      :style="
-        'height:' + ($store.state.is_show_tabs ? 'calc(100vh - 50px)' : '100vh')
-      "
-    />
+    <transition name="router-transition" mode="out-in">
+      <router-view
+        :style="
+          'height:' +
+            ($store.state.is_show_tabs ? 'calc(100vh - 50px)' : '100vh')
+        "
+    /></transition>
   </div>
 </template>
 
@@ -52,4 +54,16 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="less">
+.router-transition-enter-active {
+  transition: all 0.5s;
+}
+.router-transition-leave-active {
+  transition: all 0.5s;
+}
+.router-transition-enter,
+.router-transition-leave-to {
+  transform: translateY(30px);
+  opacity: 0;
+}
+</style>

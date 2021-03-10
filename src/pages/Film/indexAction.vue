@@ -1,6 +1,10 @@
 <template>
   <div>
     <!--    <van-sticky>-->
+    <!--    <transition-->
+    <!--      :name="isRouterTransition ? 'router-transition' : ''"-->
+    <!--      mode="in-out"-->
+    <!--    >-->
     <van-tabs
       v-model="active"
       swipeable
@@ -15,20 +19,37 @@
       <van-tab title="正在热映" to="/menu/film/nowPlaying" />
       <van-tab title="即将上映" to="/menu/film/comingSoon" />
     </van-tabs>
+    <!--    </transition>-->
     <!--    </van-sticky>-->
-    <router-view />
+    <transition
+      :name="isRouterTransition ? 'router-transition' : ''"
+      mode="out-in"
+    >
+      <router-view />
+    </transition>
   </div>
 </template>
 
 <script>
 export default {
   name: "indexAction",
+  data() {
+    return {
+      isRouterTransition: false,
+      lastActive: null // 保留上一次tabs选中项（解决跳转详情时选中项的更改）
+    };
+  },
   computed: {
     active: {
       get() {
-        return this.$route.name == "nowPlaying" ? 0 : 1;
+        if (this.$route.name == "detail") {
+          return this.lastActive;
+        }
+        let tabs = this.$route.name == "nowPlaying" ? 0 : 1;
+        return tabs;
       },
       set(value) {
+        this.lastActive = value;
         return value;
       }
     }
@@ -45,6 +66,10 @@ export default {
         });
         this.$store.dispatch("getFilmList");
       }
+    },
+    $route(to, from) {
+      this.isRouterTransition =
+        to.name != "detail" && from.name != "detail" ? false : true;
     }
   }
 };
@@ -55,5 +80,16 @@ export default {
   height: 10px;
   background-color: #ededed;
   color: #bdc0c5;
+}
+.router-transition-enter-active {
+  transition: all 0.5s;
+}
+.router-transition-leave-active {
+  transition: all 0.5s;
+}
+.router-transition-enter,
+.router-transition-leave-to {
+  transform: translateY(30px);
+  opacity: 0;
 }
 </style>

@@ -13,7 +13,7 @@
     <div class="grey-text">{{ dataDetail.category | categoryFilter }}</div>
     <div class="grey-text">{{ dataDetail.premiereAt | timeFilter }}</div>
     <div class="grey-text">
-      {{ dataDetail.nation }} | {{ dataDetail.runtime }}分钟
+      {{ dataDetail.nation }} | {{ dataDetail.runtime || "" }}分钟
     </div>
     <div class="grey-text hide">
       {{ dataDetail.synopsis }}

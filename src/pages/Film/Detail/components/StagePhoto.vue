@@ -2,7 +2,10 @@
   <div class="photos">
     <div class="photos-title-bar">
       <span class="photos-title-text">剧照</span>
-      <span class="photos-to-all" @click="photosAllClick"
+      <span
+        class="photos-to-all"
+        @click="photosAllClick"
+        v-if="$store.state.film_detail.photos"
         >全部({{
           $store.state.film_detail.photos &&
             $store.state.film_detail.photos.length
@@ -13,13 +16,12 @@
       perview="2.4"
       class="photoswiper"
       my-class="photoswiper"
-      style="height: 140px"
+      v-if="$store.state.film_detail.photos"
     >
       <li
         class="swiper-slide"
         v-for="(data, index) in $store.state.film_detail.photos"
         :key="index"
-        style="width: 150px !important;"
         @click="previewImg(index)"
       >
         <div class="swiper-photos">
@@ -27,6 +29,7 @@
         </div>
       </li>
     </detail-swiper>
+    <div v-else class="empty-text">暂无电影剧照</div>
   </div>
 </template>
 
@@ -88,28 +91,31 @@ export default {
       }
     }
   }
-  .photos-name {
-    display: block;
-    text-align: center;
-    padding-top: 10px;
-    font-size: 12px;
-    color: #191a1b;
-    width: 85px;
-    height: 18px;
-  }
-  .photos-role {
-    display: block;
-    text-align: center;
-    font-size: 10px;
-    color: #797d82;
-  }
-  .swiper-photos {
-    width: 150px;
-    height: 100px;
-    .swiper-photos-photo {
-      width: 100%;
-      height: 100%;
+  .photoswiper {
+    padding-bottom: 15px;
+    .swiper-slide {
+      width: 150px !important;
+      overflow-y: hidden;
+      .swiper-photos {
+        width: 150px;
+        height: 100px;
+        position: relative;
+        .swiper-photos-photo {
+          width: 100%;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+      }
     }
+  }
+  .empty-text {
+    height: 140px;
+    color: #bdc0c5;
+    text-align: center;
+    line-height: 70px;
+    font-size: 14px;
   }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="swiper-container">
-    <ul class="swiper-wrapper" style="padding-left: 15px">
+    <ul class="swiper-wrapper">
       <slot />
     </ul>
   </div>
@@ -21,4 +21,8 @@ export default {
   }
 };
 </script>
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.swiper-wrapper {
+  padding-left: 15px;
+}
+</style>
