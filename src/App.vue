@@ -4,11 +4,15 @@
   </div>
 </template>
 
+<script type="text/javascript">
+export default {
+  name: "app",
+  data() {
+    return {};
+  }
+};
+</script>
+
 <style lang="less">
 @import "./common/assets/css/base.css";
-* {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
 </style>

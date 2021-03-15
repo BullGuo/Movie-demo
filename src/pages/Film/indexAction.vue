@@ -1,10 +1,6 @@
 <template>
   <div>
     <!--    <van-sticky>-->
-    <!--    <transition-->
-    <!--      :name="isRouterTransition ? 'router-transition' : ''"-->
-    <!--      mode="in-out"-->
-    <!--    >-->
     <van-tabs
       v-model="active"
       swipeable
@@ -19,14 +15,8 @@
       <van-tab title="正在热映" to="/menu/film/nowPlaying" />
       <van-tab title="即将上映" to="/menu/film/comingSoon" />
     </van-tabs>
-    <!--    </transition>-->
     <!--    </van-sticky>-->
-    <transition
-      :name="isRouterTransition ? 'router-transition' : ''"
-      mode="out-in"
-    >
-      <router-view />
-    </transition>
+    <router-view />
   </div>
 </template>
 
@@ -35,7 +25,6 @@ export default {
   name: "indexAction",
   data() {
     return {
-      isRouterTransition: false,
       lastActive: null // 保留上一次tabs选中项（解决跳转详情时选中项的更改）
     };
   },
@@ -66,10 +55,6 @@ export default {
         });
         this.$store.dispatch("getFilmList");
       }
-    },
-    $route(to, from) {
-      this.isRouterTransition =
-        to.name != "detail" && from.name != "detail" ? false : true;
     }
   }
 };

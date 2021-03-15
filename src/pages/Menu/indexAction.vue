@@ -21,7 +21,8 @@
           'height:' +
             ($store.state.is_show_tabs ? 'calc(100vh - 50px)' : '100vh')
         "
-    /></transition>
+      />
+    </transition>
   </div>
 </template>
 

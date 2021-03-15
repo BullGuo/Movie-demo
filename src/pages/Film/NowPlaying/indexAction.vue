@@ -28,9 +28,6 @@ export default {
       isLoading: false
     };
   },
-  created() {
-    console.log(111111111);
-  },
   components: {
     FilmList: () => import("../components/FilmList")
   },

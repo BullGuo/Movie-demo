@@ -15,9 +15,13 @@ export default {
   width: 100%;
   height: 210px;
   overflow: hidden;
+  position: relative;
   .target-img {
     width: 100%;
-    transform: translateY(-31.5%);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 </style>

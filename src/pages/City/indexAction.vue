@@ -51,21 +51,23 @@ export default {
       deep: true,
       handler(val) {
         this.$store.commit("setCityInfo", val);
-        history.go(-1);
+        setTimeout(() => {
+          history.go(-1);
+        }, 1000);
       }
     }
   },
   async created() {
+    this.$Toast.loading({
+      message: "定位中...",
+      forbidClick: true,
+      duration: 0
+    });
     await this.init();
     await this.getCityInfo();
   },
   methods: {
     async init() {
-      this.$Toast.loading({
-        message: "定位中...",
-        forbidClick: true,
-        duration: 3000
-      });
       let list = [];
       await this.$axios({
         url: `https://m.maizuo.com/gateway?k=8954800`,
@@ -82,12 +84,13 @@ export default {
       });
       this.processData(list);
     },
+    // 获取当前城市
     async getCityInfo() {
       await asyncLoadScript({ id: "map", src: mapSrc });
       AMap = AMap || window.AMap;
       //实例化城市查询类
       let citysearch = new AMap.CitySearch();
-      //自动获取用户IP，返回当前城市
+      //根据用户IP返回当前城市
       citysearch.getLocalCity((status, result) => {
         if (status === "complete" && result.info === "OK") {
           if (result && result.city && result.bounds) {
@@ -97,13 +100,15 @@ export default {
                 name: result.city
               });
               this.cityInfo.name = result.city;
-            }, 2900);
+              this.$Toast.clear();
+            }, 1000);
           }
         } else {
-          console.log("位置信息获取失败!");
+          this.$Toast.loading("位置信息获取失败");
         }
       });
     },
+    // 将城市数据根据首字母排序
     processData(list) {
       let detail = {};
       for (let index = 65; index < 91; index++) {
@@ -144,6 +149,7 @@ export default {
     }
   },
   components: {
+    // 索引栏
     CityIndexBar: () => import("./components/CityIndexBar"),
     RecommendCity: () => import("./components/RecommendCity"),
     SearchCityList: () => import("./components/SearchCityList")

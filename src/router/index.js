@@ -24,14 +24,14 @@ const routes = [
             path: "comingSoon",
             name: "comingSoon",
             component: () => import("../pages/Film/ComingSoon/indexAction")
-          },
-          {
-            path: "detail/:id",
-            name: "detail",
-            props: true,
-            component: () => import("../pages/Film/Detail/indexAction")
           }
         ]
+      },
+      {
+        path: "detail/:id",
+        name: "detail",
+        props: true,
+        component: () => import("../pages/Film/Detail/indexAction")
       },
       {
         path: "cinemas",

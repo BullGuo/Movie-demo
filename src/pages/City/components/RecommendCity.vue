@@ -4,7 +4,7 @@
       <div class="city-index-title">GPS定位你所在城市</div>
       <ul class="city-index-detail">
         <div class="city-item-detail">
-          {{ cityName ? cityName : "定位失败" }}
+          {{ cityName ? cityName : "--" }}
         </div>
       </ul>
     </div>
