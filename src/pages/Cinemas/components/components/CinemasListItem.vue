@@ -40,6 +40,7 @@ export default {
   },
   methods: {
     goCinemasDetail() {
+      this.$store.commit("setTabs", false);
       this.$router.push({
         name: "cinemas_detail",
         params: { cinemaId: this.detail.cinemaId }

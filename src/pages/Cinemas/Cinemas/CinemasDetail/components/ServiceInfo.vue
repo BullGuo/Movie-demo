@@ -23,7 +23,7 @@ export default {
   position: fixed;
   top: 90px;
   left: 0;
-  z-index: -1;
+  z-index: 0;
   background-color: #fff;
   .services {
     padding: 0 30px;

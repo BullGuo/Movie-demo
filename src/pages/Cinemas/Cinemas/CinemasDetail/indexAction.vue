@@ -7,7 +7,7 @@
     <div class="header-title">
       {{ detail.name }}
     </div>
-    <div v-if="!showClose">
+    <div v-show="!showClose">
       <cinema-wrap :show-close.sync="showClose" :detail="detail" />
       <film-list :cinema-id="cinemaId" />
     </div>

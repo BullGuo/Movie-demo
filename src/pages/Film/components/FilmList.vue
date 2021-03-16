@@ -54,6 +54,7 @@ export default {
   methods: {
     async handleClick(id) {
       await this.$store.dispatch("getFilmDetail", id);
+      this.$store.commit("setTabs", false);
       this.$router.push({ name: "detail", params: { id: id } });
     }
   }
