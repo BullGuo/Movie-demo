@@ -6,101 +6,116 @@
       animated
       border
       color="#ff5f16"
-      line-height="2px"
-      line-width="56px"
       title-active-color="#ff5f16"
+      swipe-threshold="1"
+      class="date-list"
     >
-      <van-tab :title="item" v-for="(item, index) in tabList" :key="index">
-        {{ item }}
+      <van-tab
+        :title="item"
+        v-for="(item, index) in tabList"
+        :key="index"
+        title-class="date-list-item"
+      >
+        <schedule-list :schedules-list="schedulesList" />
       </van-tab>
     </van-tabs>
-    <schedule-list />
   </div>
 </template>
 
 <script>
-import moment from "moment";
 export default {
   name: "DateList",
   props: {
-    id: Object
+    id: Object,
+    detail: {
+      type: Object,
+      default: () => {}
+    }
   },
   watch: {
-    id() {
-      this.init();
+    async id(val) {
+      this.active = 0;
+      await this.init();
+      if (!val.cinemaId || !val.filmId) return;
+      this.getScheduleList();
+    },
+    active: {
+      handler(val) {
+        if (!val) return;
+        this.getScheduleList();
+      }
     }
   },
   data() {
     return {
       tabList: [],
-      active: 0
+      active: 0,
+      schedulesList: []
     };
   },
   methods: {
-    async init() {
+    init() {
       let arr = [];
-      for (let i = 0; i < 11; ) {
-        let b = moment(moment().add(i, "d"));
-        // let milliseconds = b.startOf("day").format("X");
-        if (b.diff(moment(), "d") > 1) {
-          arr.push(this.getWeek(b));
+      this.$moment.lang("zh-cn");
+      if (!this.detail.showDate.length) return;
+      for (let index in this.detail.showDate) {
+        let day = this.$moment(this.detail.showDate[index] * 1000).format(
+          "M月D日"
+        );
+        if (index <= 1) {
+          arr.push(
+            this.$moment(this.detail.showDate[index] * 1000)
+              .calendar()
+              .substring(0, 2) + day
+          );
         } else {
-          arr.push(this.getLately(b, i));
+          arr.push(this.getWeek(this.detail.showDate[index]) + day);
         }
-        // await this.getScheduleList(milliseconds);
-        ++i;
       }
       this.tabList = [...arr];
     },
     getWeek(date) {
-      let d = date.format("M月D日");
-      let week = date.day();
+      let week = this.$moment(date * 1000).day();
       switch (week) {
         case 1:
-          return "周一" + d;
+          return "周一";
         case 2:
-          return "周二" + d;
+          return "周二";
         case 3:
-          return "周三" + d;
+          return "周三";
         case 4:
-          return "周四" + d;
+          return "周四";
         case 5:
-          return "周五" + d;
+          return "周五";
         case 6:
-          return "周六" + d;
+          return "周六";
         case 0:
-          return "周日" + d;
+          return "周日";
       }
     },
-    getLately(date, index) {
-      let d = date.format("M月D日");
-      switch (index) {
-        case 0:
-          return "今天" + d;
-        case 1:
-          return "明天" + d;
-        case 2:
-          return "后天" + d;
-      }
-    },
-    getScheduleList(milliseconds) {
-      let params = {
-        filmId: this.id.filmId,
-        cinemaId: this.id.cinemaId,
-        date: milliseconds,
-        k: 8080306
-      };
+    getScheduleList() {
+      this.$Toast.loading({
+        forbidClick: true,
+        duration: 0,
+        loadingType: "spinner",
+        className: "toast"
+      });
       this.$axios({
         url: `https://m.maizuo.com/gateway/`,
-        params: { ...params },
+        params: {
+          ...this.id,
+          date: this.detail.showDate[this.active],
+          k: 3659182
+        },
         headers: {
           "X-Client-Info":
-            '{"a":"3000","ch":"1002","v":"5.0.4","e":"16092348011945091904110593","bc":"510100"}',
+            '{"a":"3000","ch":"1002","v":"5.0.4","e":"16092348011945091904110593"}',
           "X-Host": "mall.film-ticket.schedule.list"
         }
       }).then(res => {
-        if (res) {
-          console.log(res);
+        if (res && res.data.msg == "表示成功") {
+          this.schedulesList = [...res.data.data.schedules];
+          this.$Toast.clear();
         }
       });
     }
@@ -111,4 +126,19 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="less">
+.date-list {
+  /deep/ .van-tabs__nav {
+    padding: 0 0 15px !important;
+    justify-content: flex-start;
+  }
+  /deep/ .date-list-item {
+    flex: none;
+    width: 110px;
+  }
+}
+/deep/ .van-tabs__line {
+  width: 80px;
+  height: 2px;
+}
+</style>

@@ -36,6 +36,7 @@ export default {
   methods: {
     init() {
       let params = { cinemaId: this.cinemaId, k: 3239016 };
+      // 影院信息
       this.$axios({
         url: `https://m.maizuo.com/gateway/`,
         params: { ...params },

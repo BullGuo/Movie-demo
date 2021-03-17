@@ -52,6 +52,12 @@ const routes = [
           import("../pages/Cinemas/Cinemas/CinemasDetail/indexAction")
       },
       {
+        path: "cinemas/:cinemaId/:schedule",
+        name: "schedule",
+        props: true,
+        component: () => import("../pages/Cinemas/ChooseSeat/indexAction")
+      },
+      {
         path: "search",
         name: "search",
         component: () => import("../pages/Cinemas/CinemasSearch/indexAction")

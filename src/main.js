@@ -7,12 +7,14 @@ import "vant/lib/index.css";
 import { Toast } from "vant";
 import axios from "axios";
 import "./common/utils/rem";
+import moment from "moment";
 
 Vue.config.productionTip = false;
 Vue.use(Vant);
 Vue.use(Toast);
 Vue.prototype.$Toast = Toast;
 Vue.prototype.$axios = axios;
+Vue.prototype.$moment = moment;
 
 new Vue({
   router,

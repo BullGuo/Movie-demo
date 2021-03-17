@@ -27,6 +27,7 @@
         cinemaId: cinemaId,
         filmId: list[activeIndex] ? list[activeIndex].filmId : ''
       }"
+      :detail="list[activeIndex] ? list[activeIndex] : {}"
     />
   </div>
 </template>
@@ -44,7 +45,7 @@ export default {
     return {
       list: [],
       activeIndex: 0,
-      filmId:''
+      filmId: ""
     };
   },
   created() {
@@ -53,6 +54,7 @@ export default {
   methods: {
     init() {
       let params = { cinemaId: this.cinemaId, k: 3239016 };
+      // 影院电影信息
       this.$axios({
         url: `https://m.maizuo.com/gateway/`,
         params: { ...params },
@@ -69,6 +71,7 @@ export default {
             new Swiper(".swiper-container", {
               slidesPerView: 4,
               spaceBetween: 12,
+              slideToClickedSlide: true, // 点击可切换
               centeredSlides: true,
               on: {
                 slideChange: e => {
