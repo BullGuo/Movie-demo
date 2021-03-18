@@ -42,7 +42,11 @@ export default {
     chooseSeat(data) {
       this.$router.push({
         name: "schedule",
-        params: { schedule: data.scheduleId }
+        params: {
+          schedule: data.scheduleId,
+          ticketList: [data.maxSalePrice, data.minSalePrice],
+          schedulesList: this.schedulesList
+        }
       });
     }
   },
