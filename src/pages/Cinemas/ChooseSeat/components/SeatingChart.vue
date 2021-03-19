@@ -214,32 +214,38 @@ export default {
   },
   methods: {
     // 点击每个座位触发的函数
-    clickSeat(el, data, index) {
+    clickSeat(el, data) {
       console.log(el);
-      if (!this.seatList[index].isBroken && !this.seatList[index].isOccupied) {
-        if (this.seatList[index].isSelected) {
-          this.processSelected(index);
+      debugger;
+      if (!data.isBroken && !data.isOccupied) {
+        if (data.isSelected) {
+          this.processSelected(el, data);
         } else {
-          this.processUnSelected(el, index);
+          this.processUnSelected(el, data);
         }
       }
     },
     // 处理已选的座位
-    processSelected(index) {
-      console.log(index);
+    processSelected(el, data) {
+      let _selectedSeatList = this.selectedSeatList;
+      // 改变这些座位的图标为初始图标 并 移除id一样的座位
+      el.target.src = require("../../img/seat-one.png");
+      for (let index in _selectedSeatList) {
+        if (_selectedSeatList[index].offerSeatId === data.offerSeatId) {
+          _selectedSeatList.splice(index, 1);
+          data.isSelected = false;
+        }
+      }
     },
     // 处理未选择的座位
-    processUnSelected(el, index) {
-      console.log(index);
+    processUnSelected(el, data) {
       // 如果是选择第一个座位 放大区域并移动区域 突出座位 增加用户体验
       if (!this.selectedSeatList.length) {
         let top =
-          (this.seatList[index].rowNum * this.positionDistin -
-            this.horizontalLine) *
+          (data.rowNum * this.positionDistin - this.horizontalLine) *
           this.seatScale;
         let left =
-          (this.seatList[index].columnNum * this.positionDistin -
-            this.middleLine) *
+          (data.columnNum * this.positionDistin - this.middleLine) *
           this.seatScale;
         top = top > 0 ? -top - this.positionDistin : -top + this.positionDistin;
         left =
@@ -259,9 +265,10 @@ export default {
       // 改变这些座位的图标为已选择图标
       el.target.src = require("../../img/selected.png");
       // 记录 orgIndex属性 是原seatList数组中的下标值
-      this.seatList[index].orgIndex = index;
+      // data.orgIndex = index;
+      data.isSelected = true;
       // 把选择的座位放入到已选座位数组中
-      _selectedSeatList.push(this.seatList[index]);
+      _selectedSeatList.push(data);
     },
     thumbnailBackground() {
       // if (seatItem.isOccupied) {
