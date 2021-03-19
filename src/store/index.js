@@ -68,6 +68,7 @@ export default new Vuex.Store({
       )
         return;
       let cityId = store.state.cityInfo.cityID || store.state.cityInfo.cityId;
+      if (!cityId) return;
       return axios({
         url: "https://m.maizuo.com/gateway",
         params: {

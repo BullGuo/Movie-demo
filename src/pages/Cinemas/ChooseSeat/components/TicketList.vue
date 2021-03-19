@@ -1,11 +1,7 @@
 <template>
   <ul class="ticket-list" v-if="ticketList.length">
     <li v-for="(item, index) of ticketList" :key="index" class="list-item">
-      <div
-        :style="{
-          '--color': `${index ? 'rgb(92,214,4)' : 'rgb(239,193,0)'}`
-        }"
-      />
+      <img src="../../img/seat-one.png" alt="" />
       <span>￥{{ item / 100 }}</span>
     </li>
   </ul>
@@ -29,17 +25,17 @@ export default {
   height: 40px;
   line-height: 40px;
   padding: 0 15px;
+  background-color: #fff;
   .list-item {
     margin-right: 15px;
     display: flex;
     align-items: center;
-    div {
-      width: 16px;
-      height: 16px;
-      border: 1px solid var(--color);
+    img {
+      width: 25px;
+      height: 25px;
     }
     span {
-      margin-left: 2px;
+      margin: 3px 0 0 2px;
       color: #797d82;
       font-size: 13px;
     }

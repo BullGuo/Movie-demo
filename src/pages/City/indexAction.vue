@@ -50,9 +50,10 @@ export default {
     cityInfo: {
       deep: true,
       handler(val) {
+        if (!val || !val.name || !val.cityId) return;
         this.$store.commit("setCityInfo", val);
         setTimeout(() => {
-          history.go(-1);
+          this.$router.push({ name: "menu" });
         }, 1000);
       }
     }
@@ -100,6 +101,7 @@ export default {
                 name: result.city
               });
               this.cityInfo.name = result.city;
+              this.cityInfo.cityId = result.adcode;
               this.$Toast.clear();
             }, 1000);
           }

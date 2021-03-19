@@ -49,9 +49,6 @@ export default {
         }
       });
     }
-  },
-  beforeDestroy() {
-    this.$store.commit("setTabs", false);
   }
 };
 </script>

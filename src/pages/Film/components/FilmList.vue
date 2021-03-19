@@ -1,35 +1,38 @@
 <template>
-  <ul class="film-list-class">
-    <li
-      v-for="data in $store.state.film_list"
-      :key="data.filmId"
-      @click="handleClick(data.filmId)"
-    >
-      <img :src="data.poster" />
-      <div class="nowPlayingFilm-info">
-        <div class="film-name">
-          <span class="name">{{ data.name }}</span>
-          <span class="item">{{ data.filmType.name }}</span>
-        </div>
-        <div class="film-grade" v-if="data.grade">
-          <span class="info-col">观众评分 </span>
-          <span class="grade">{{ data.grade }}</span>
-        </div>
-        <div class="van-ellipsis info-col">
-          主演：{{ data.actors | actorFilter }}
-        </div>
-        <div class="info-col">{{ data.nation }} | {{ data.runtime }}分钟</div>
-      </div>
-      <van-button
-        plain
-        :color="button_text == '购票' ? '#ff5f16' : '#ffb232'"
-        size="small"
-        v-if="data.isPresale"
+  <div>
+    <ul class="film-list-class" v-if="$store.state.film_list.length">
+      <li
+        v-for="data in $store.state.film_list"
+        :key="data.filmId"
+        @click="handleClick(data.filmId)"
       >
-        {{ button_text }}
-      </van-button>
-    </li>
-  </ul>
+        <img :src="data.poster" />
+        <div class="nowPlayingFilm-info">
+          <div class="film-name">
+            <span class="name">{{ data.name }}</span>
+            <span class="item">{{ data.filmType.name }}</span>
+          </div>
+          <div class="film-grade" v-if="data.grade">
+            <span class="info-col">观众评分 </span>
+            <span class="grade">{{ data.grade }}</span>
+          </div>
+          <div class="van-ellipsis info-col">
+            主演：{{ data.actors | actorFilter }}
+          </div>
+          <div class="info-col">{{ data.nation }} | {{ data.runtime }}分钟</div>
+        </div>
+        <van-button
+          plain
+          :color="button_text == '购票' ? '#ff5f16' : '#ffb232'"
+          size="small"
+          v-if="data.isPresale"
+        >
+          {{ button_text }}
+        </van-button>
+      </li>
+    </ul>
+    <van-empty v-else description="暂无数据" :image="emptyImg" />
+  </div>
 </template>
 
 <script>
@@ -40,6 +43,11 @@ export default {
       type: String,
       default: "购票"
     }
+  },
+  data() {
+    return {
+      emptyImg: require("@/common/assets/img/empty.png")
+    };
   },
   filters: {
     actorFilter(actor) {

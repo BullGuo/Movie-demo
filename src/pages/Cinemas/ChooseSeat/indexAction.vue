@@ -54,7 +54,6 @@ export default {
       });
       // 座位列表
       this.$axios({
-        //17737
         url: `https://m.maizuo.com/gateway/`,
         params: { ...params },
         headers: {

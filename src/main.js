@@ -8,10 +8,13 @@ import { Toast } from "vant";
 import axios from "axios";
 import "./common/utils/rem";
 import moment from "moment";
+import VueTouch from "vue-touch";
+// var VueTouch = require("vue-touch");
 
 Vue.config.productionTip = false;
 Vue.use(Vant);
 Vue.use(Toast);
+Vue.use(VueTouch, { name: "v-touch" });
 Vue.prototype.$Toast = Toast;
 Vue.prototype.$axios = axios;
 Vue.prototype.$moment = moment;

@@ -16,7 +16,11 @@
         :key="index"
         title-class="date-list-item"
       >
-        <schedule-list :schedules-list="schedulesList" />
+        <schedule-list
+          :schedules-list="schedulesList"
+          v-if="schedulesList.length"
+        />
+        <van-empty v-else description="暂无数据" :image="emptyImg" />
       </van-tab>
     </van-tabs>
   </div>
@@ -50,7 +54,8 @@ export default {
     return {
       tabList: [],
       active: 0,
-      schedulesList: []
+      schedulesList: [],
+      emptyImg: require("@/common/assets/img/empty.png")
     };
   },
   methods: {
@@ -115,8 +120,8 @@ export default {
       }).then(res => {
         if (res && res.data.msg == "表示成功") {
           this.schedulesList = [...res.data.data.schedules];
-          this.$Toast.clear();
         }
+        this.$Toast.clear();
       });
     }
   },
@@ -135,6 +140,9 @@ export default {
   /deep/ .date-list-item {
     flex: none;
     width: 110px;
+    /deep/ .van-empty {
+      padding: 20px 0;
+    }
   }
 }
 /deep/ .van-tabs__line {

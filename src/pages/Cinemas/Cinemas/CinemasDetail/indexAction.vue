@@ -58,8 +58,9 @@ export default {
       this.showClose = false;
     }
   },
-  beforeDestroy() {
-    this.$store.commit("setTabs", true);
+  beforeRouteLeave(to, from, next) {
+    this.$store.commit("setTabs", to.name == "cinemas" ? true : false);
+    next();
   },
   components: {
     CinemaWrap: () => import("./components/CinemaWrap"),
