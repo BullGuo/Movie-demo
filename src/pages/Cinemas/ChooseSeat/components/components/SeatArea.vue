@@ -166,6 +166,23 @@ export default {
     };
   },
   methods: {
+    // 第一次点击座位改变放大比例
+    changeScale: function() {
+      if (this.maxscale === 1) {
+        return;
+      }
+      this.scale = this.maxscale;
+    },
+    // 第一次点击座位改变偏移
+    changePosition: function(top, left) {
+      if (this.maxscale === 1) {
+        return;
+      }
+      let _this = this;
+      // 0.67是上方 屏幕方向dom 部分偏移的部分 也是 .box margin-top 的50px
+      _this.top = top * (this.scale - 1) + 0.67;
+      _this.left = left * (this.scale - 1);
+    },
     // seat-tool 内的字体大小
     seatToolFontSize() {
       let fontsize = 20 / this.pxtorem;
@@ -223,10 +240,10 @@ export default {
         this.leftThumbnail = 0;
       } else {
         // 如果宽度度移动超过了边界值 把移动置为边界值
-        if (this.left > this.crossleft) {
-          this.left = this.crossleft;
-        } else if (this.left < -this.crossleft) {
-          this.left = -this.crossleft;
+        if (this.left > this.crossLeft) {
+          this.left = this.crossLeft;
+        } else if (this.left < -this.crossLeft) {
+          this.left = -this.crossLeft;
         }
         // 缩略图移动超过了边界值 把移动置为边界值
         if (this.leftThumbnail > this.thumbnailWidthRemProportion) {
@@ -235,10 +252,10 @@ export default {
           this.leftThumbnail = -this.thumbnailWidthRemProportion;
         }
         // 如果高度移动超过了边界值 把移动置为边界值
-        if (this.top > this.crosstop) {
-          this.top = this.crosstop;
-        } else if (this.top < -this.crosstop) {
-          this.top = -this.crosstop;
+        if (this.top > this.crossTop) {
+          this.top = this.crossTop;
+        } else if (this.top < -this.crossTop) {
+          this.top = -this.crossTop;
         }
         // 缩略图移动超过了边界值 把移动置为边界值
         if (this.topThumbnail > this.thumbnailHeightRemProportion) {
@@ -253,9 +270,9 @@ export default {
     }
   },
   computed: {
-    // seat-tool-item 的宽度
-    seatToolWidthWithScale() {
-      return 0.5 * this.scale;
+    // 最大放大比例
+    maxscale: function() {
+      return 1 + 1 / this.seatScale;
     },
     // 每个座位放大后的高度
     seatHeightWithScale() {
@@ -271,7 +288,7 @@ export default {
       return (
         this.top +
         this.seatHeightWithScale * this.seatScale -
-        this.crosstop +
+        this.crossTop +
         height
       );
     },
@@ -284,16 +301,12 @@ export default {
       return (this.horizontalLine / this.seatAreaHeightRem) * this.seatScale;
     },
     // 左边触边吸附边界值rem
-    crossleft() {
+    crossLeft() {
       return (this.scale - 1) * this.seatAreaWidthRem * this.scaleXCross;
     },
     // 上边触边吸附边界值rem
-    crosstop() {
+    crossTop() {
       return (this.scale - 1) * this.seatAreaHeightRem * this.scaleYCross;
-    },
-    // scale的倒数
-    scalereciprocal() {
-      return 1 / this.scale;
     },
     // 最大放大比例
     maxScale() {
@@ -309,11 +322,11 @@ export default {
     },
     // 缩略图宽度触边吸附边界值
     thumbnailWidthRemProportion() {
-      return ((1 - this.scalereciprocal) * this.thumbnailWidthRem) / 2;
+      return ((1 - this.scaleReciprocal) * this.thumbnailWidthRem) / 2;
     },
     // 缩略图高度触边吸附边界值
     thumbnailHeightRemProportion() {
-      return ((1 - this.scalereciprocal) * this.thumbnailHeightRem) / 2;
+      return ((1 - this.scaleReciprocal) * this.thumbnailHeightRem) / 2;
     }
   }
 };
@@ -373,7 +386,7 @@ export default {
   }
   .seat-tool-parent {
     overflow: hidden;
-    margin-top: 50px;
+    padding-top: 50px;
     .seat-tool {
       display: flex;
       flex-direction: column;

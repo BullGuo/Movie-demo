@@ -1,20 +1,4 @@
 <template>
-  <!--  <div-->
-  <!--    class="seating-chart"-->
-  <!--    :style="{-->
-  <!--      '&#45;&#45;width': seatingChart.width,-->
-  <!--      '&#45;&#45;height': seatingChart.height-->
-  <!--    }"-->
-  <!--    v-if="seatingChart.width && seatingChart.height"-->
-  <!--  >-->
-  <!--    <template>-->
-  <!--      <div v-for="item in seatingChart.width * seatingChart.height" :key="item">-->
-  <!--        <p v-if="aaaa(item)">-->
-  <!--          {{ item }}-->
-  <!--        </p>-->
-  <!--      </div>-->
-  <!--    </template>-->
-  <!--  </div>-->
   <div>
     <seat-area
       :seatAreaHeightRem="seatAreaHeightRem"
@@ -28,6 +12,7 @@
       :seatBoxHeight="seatBoxHeight"
       :middleLine="middleLine"
       :horizontalLine="horizontalLine"
+      ref="seatArea"
     >
       <!--以下为缩略座位图具名插槽 开始-->
       <template slot="thumbnail-seat-slot">
@@ -67,7 +52,7 @@
           <template v-for="(item, index) in seatList">
             <div
               class="seatClass"
-              @click="clickSeat(index)"
+              @click="clickSeat($event, item, index)"
               :key="item.offerSeatId"
               :style="{
                 top: item.rowNum * positionDistin + 'rem',
@@ -100,7 +85,6 @@ export default {
   },
   watch: {
     seatingChart(val) {
-      console.log(val);
       this.seatList = val.seats;
       this.xMax = val.width;
       this.yMax = val.height;
@@ -118,7 +102,9 @@ export default {
       left: 0, // 单位rem
       thumbnailWidth: 0.1, // 缩略图每个座位的宽
       thumbnailHeight: 0.1, // 缩略图每个座位的高
-      thumbnailPositionDistin: 0.15 // 缩略图每个座位偏移距离
+      thumbnailPositionDistin: 0.15, // 缩略图每个座位偏移距离
+      selectedSeatList: [], // 已选择座位
+      maxSelect: 4 // 最大选择座位数量 改动可改变最大选择座位数
     };
   },
   created() {
@@ -170,7 +156,6 @@ export default {
     },
     // 横中轴线
     horizontalLine() {
-      console.log((this.yMax / 2 + 1) * this.positionDistin - 0.025);
       return (this.yMax / 2 + 1) * this.positionDistin - 0.025;
     },
     // 让影厅居中展示的偏移值
@@ -191,7 +176,6 @@ export default {
       let seatScaleY = 1;
       seatScaleX = this.seatAreaWidthRem / this.seatBoxWidth;
       seatScaleY = this.seatAreaHeightRem / this.seatBoxHeight;
-      console.log(seatScaleX < seatScaleY ? seatScaleX : seatScaleY);
       return seatScaleX < seatScaleY ? seatScaleX : seatScaleY;
     },
     // 缩放.box区域 x轴的中心点
@@ -230,16 +214,54 @@ export default {
   },
   methods: {
     // 点击每个座位触发的函数
-    clickSeat(index) {
-      if (this.seatList[index].canClick) {
-        if (
-          this.seatList[index].nowIcon === this.seatList[index].selectedIcon
-        ) {
+    clickSeat(el, data, index) {
+      console.log(el);
+      if (!this.seatList[index].isBroken && !this.seatList[index].isOccupied) {
+        if (this.seatList[index].isSelected) {
           this.processSelected(index);
         } else {
-          this.processUnSelected(index);
+          this.processUnSelected(el, index);
         }
       }
+    },
+    // 处理已选的座位
+    processSelected(index) {
+      console.log(index);
+    },
+    // 处理未选择的座位
+    processUnSelected(el, index) {
+      console.log(index);
+      // 如果是选择第一个座位 放大区域并移动区域 突出座位 增加用户体验
+      if (!this.selectedSeatList.length) {
+        let top =
+          (this.seatList[index].rowNum * this.positionDistin -
+            this.horizontalLine) *
+          this.seatScale;
+        let left =
+          (this.seatList[index].columnNum * this.positionDistin -
+            this.middleLine) *
+          this.seatScale;
+        top = top > 0 ? -top - this.positionDistin : -top + this.positionDistin;
+        left =
+          left > 0 ? -left - this.positionDistin : -left + this.positionDistin;
+        this.$refs.seatArea.changeScale();
+        this.$refs.seatArea.changePosition(top, left);
+      }
+      let _selectedSeatList = this.selectedSeatList;
+      // 选中后 判断选择个数不大于 maxSelect
+      if (_selectedSeatList.length >= this.maxSelect) {
+        this.$Toast({
+          message: "最多只能选择" + this.maxSelect + "个座位哦~",
+          position: "bottom"
+        });
+        return;
+      }
+      // 改变这些座位的图标为已选择图标
+      el.target.src = require("../../img/selected.png");
+      // 记录 orgIndex属性 是原seatList数组中的下标值
+      this.seatList[index].orgIndex = index;
+      // 把选择的座位放入到已选座位数组中
+      _selectedSeatList.push(this.seatList[index]);
     },
     thumbnailBackground() {
       // if (seatItem.isOccupied) {
@@ -276,22 +298,6 @@ export default {
 </script>
 
 <style scoped lang="less">
-.seating-chart {
-  display: grid;
-  height: calc(100% - 46px - 40px - 40px - 45px - 88px);
-  /*grid-template-columns: 1fr 1fr;*/
-  /*grid-template-columns: repeat(3, 1fr);*/
-  grid-template-columns: repeat(var(--width), 1fr);
-  /*grid-template-rows: repeat(var(--height), 1fr);*/
-  gap: 5px;
-  grid-template-areas:
-    "a . c"
-    "d . f"
-    "g . i";
-  p {
-    background-color: #fbf4d8;
-  }
-}
 .thumbnail-seat-class {
   position: absolute;
 }
