@@ -13,7 +13,9 @@
       </div>
       <div class="address">
         <img src="../img/address.png" alt="" class="left-icon" />
-        <div class="address-title">{{ detail.address }}</div>
+        <div class="address-title" @click="goToNavigation">
+          {{ detail.address }}
+        </div>
         <a :href="`tel:${detail.phone}`">
           <img src="../img/phone.png" alt="" class="right-icon" />
         </a>
@@ -31,6 +33,9 @@ export default {
   methods: {
     tagInfo() {
       this.$emit("update:showClose", true);
+    },
+    goToNavigation() {
+      console.log(this.detail);
     }
   }
 };

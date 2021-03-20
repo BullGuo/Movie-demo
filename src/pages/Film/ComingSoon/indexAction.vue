@@ -45,7 +45,7 @@ export default {
     async onRefresh() {
       this.$store.commit("setParams", { pageNum: 1 });
       await this.$store.dispatch("getFilmList");
-      this.$Toast("刷新成功");
+      this.$Toast({ message: "刷新成功", position: "bottom" });
       this.isLoading = false;
     }
   }

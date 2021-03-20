@@ -215,8 +215,6 @@ export default {
   methods: {
     // 点击每个座位触发的函数
     clickSeat(el, data) {
-      console.log(el);
-      debugger;
       if (!data.isBroken && !data.isOccupied) {
         if (data.isSelected) {
           this.processSelected(el, data);
