@@ -19,7 +19,7 @@
         <template v-for="seatItem in seatList">
           <div
             class="thumbnail-seat-class"
-            :key="'thumbnail' + seatItem.offerSeatId"
+            :key="seatItem.offerSeatId"
             :style="{
               height: thumbnailHeight + 'rem',
               width: thumbnailWidth + 'rem',
@@ -52,7 +52,7 @@
           <template v-for="(item, index) in seatList">
             <div
               class="seatClass"
-              @click="clickSeat($event, item, index)"
+              @click="clickSeat($event, item)"
               :key="item.offerSeatId"
               :style="{
                 top: item.rowNum * positionDistin + 'rem',
@@ -104,7 +104,7 @@ export default {
       thumbnailHeight: 0.1, // 缩略图每个座位的高
       thumbnailPositionDistin: 0.15, // 缩略图每个座位偏移距离
       selectedSeatList: [], // 已选择座位
-      maxSelect: 4 // 最大选择座位数量 改动可改变最大选择座位数
+      maxSelect: 5 // 最大选择座位数量
     };
   },
   created() {
@@ -117,16 +117,22 @@ export default {
     this.$nextTick(() => {
       this.$Toast.clear();
     });
+    this.$bus.$on("deleteSeat", this.deleteSeat);
+  },
+  beforeDestroy() {
+    this.$bus.$off("deleteSeat", this.deleteSeat);
   },
   computed: {
     getSeatImg() {
       return function(data) {
-        if (data.isOccupied) {
+        if (data.isOccupied && !data.isBroken) {
           return require("../../img/sold-out.png"); // 已售
         } else if (data.sectionId == 637) {
           return require("../../img/seat-two.png"); // 居中好座位
         } else if (data.isBroken) {
           return require("../../img/service.png"); // 维修不可选
+        } else if (data.isSelected) {
+          return require("../../img/selected.png"); // 已选
         } else {
           return require("../../img/seat-one.png"); // 普通座位
         }
@@ -213,6 +219,35 @@ export default {
     }
   },
   methods: {
+    // 删除已选座位
+    deleteSeat(data) {
+      data.isSelected = false;
+      let index = this.getSeatIndex(this.seatList, data);
+      if (index >= 0) {
+        this.seatList[index].isSelected = false;
+      }
+      this.selectedSeatList.splice(
+        this.getSeatIndex(this.selectedSeatList, data),
+        1
+      );
+      this.sendSeatList();
+    },
+    getSeatIndex(list, data) {
+      let index = list.findIndex(item => {
+        return (
+          item.offerSeatId == data.offerSeatId &&
+          item.columnNum == data.columnNum &&
+          item.rowNum == data.rowNum
+        );
+      });
+      return index;
+    },
+    // 切换时间场次时，初始化缩略图与放大比例
+    changeTime() {
+      this.selectedSeatList = [];
+      this.$refs.seatArea.init();
+      this.sendSeatList();
+    },
     // 点击每个座位触发的函数
     clickSeat(el, data) {
       if (!data.isBroken && !data.isOccupied) {
@@ -221,13 +256,16 @@ export default {
         } else {
           this.processUnSelected(el, data);
         }
+        this.sendSeatList();
       }
+    },
+    // 发送已选座位list
+    sendSeatList() {
+      this.$emit("getSeatList", this.selectedSeatList);
     },
     // 处理已选的座位
     processSelected(el, data) {
       let _selectedSeatList = this.selectedSeatList;
-      // 改变这些座位的图标为初始图标 并 移除id一样的座位
-      el.target.src = require("../../img/seat-one.png");
       for (let index in _selectedSeatList) {
         if (_selectedSeatList[index].offerSeatId === data.offerSeatId) {
           _selectedSeatList.splice(index, 1);
@@ -237,7 +275,7 @@ export default {
     },
     // 处理未选择的座位
     processUnSelected(el, data) {
-      // 如果是选择第一个座位 放大区域并移动区域 突出座位 增加用户体验
+      // 如果是选择第一个座位 放大区域并移动区域 突出座位 增加体验
       if (!this.selectedSeatList.length) {
         let top =
           (data.rowNum * this.positionDistin - this.horizontalLine) *
@@ -251,49 +289,27 @@ export default {
         this.$refs.seatArea.changeScale();
         this.$refs.seatArea.changePosition(top, left);
       }
-      let _selectedSeatList = this.selectedSeatList;
       // 选中后 判断选择个数不大于 maxSelect
-      if (_selectedSeatList.length >= this.maxSelect) {
+      if (this.selectedSeatList.length >= this.maxSelect) {
         this.$Toast({
           message: "最多只能选择" + this.maxSelect + "个座位哦~",
           position: "bottom"
         });
         return;
       }
-      // 改变这些座位的图标为已选择图标
-      el.target.src = require("../../img/selected.png");
-      // 记录 orgIndex属性 是原seatList数组中的下标值
-      // data.orgIndex = index;
-      data.isSelected = true;
+      this.$set(data, "isSelected", true);
       // 把选择的座位放入到已选座位数组中
-      _selectedSeatList.push(data);
+      this.selectedSeatList.push(data);
     },
-    thumbnailBackground() {
-      // if (seatItem.isOccupied) {
-      //   return require("../../img/sold-out.png"); // 已售
-      // } else if (seatItem.sectionId == 637) {
-      //   return require("../../img/seat-two.png"); // 居中好座位
-      // } else if (seatItem.isBroken) {
-      //   return require("../../img/service.png"); // 维修不可选
-      // } else {
-      //   return require("../../img/seat-one.png"); // 普通座位
-      // }
-      return "white";
-      // if (seatItem.nowIcon === seatItem.selectedIcon) {
-      //   return "green";
-      // } else if (seatItem.nowIcon === seatItem.soldedIcon) {
-      //   return "red";
-      // } else if (seatItem.nowIcon === seatItem.fixIcon) {
-      //   return "red";
-      // } else {
-      //   return "white";
-      // }
-    },
-    aaaa(data) {
-      return this.seatingChart.seats.find(
-        item =>
-          +item.columnNum + (+item.rowNum - 1) * this.seatingChart.width == data
-      );
+    // 缩略图背景色
+    thumbnailBackground(data) {
+      if (data.isOccupied || data.isBroken) {
+        return "#EA606A"; // 已售或维修不可选
+      } else if (data.isSelected) {
+        return "#89CB33";
+      } else {
+        return "white"; // 普通座位
+      }
     }
   },
   components: {

@@ -18,7 +18,7 @@
             {{ activeNames.length ? "收起场次" : "切换场次" }}
           </div>
         </template>
-        <div class="swiper-container">
+        <div class="swiper-container time-card">
           <div class="swiper-wrapper">
             <div
               :class="[
@@ -39,6 +39,7 @@
         </div>
       </van-collapse-item>
     </van-collapse>
+    <selectSeatList v-bind="$attrs" />
   </div>
 </template>
 
@@ -69,7 +70,7 @@ export default {
         if (!val.length) return;
         this.$nextTick(() => {
           /* eslint-disable no-new */
-          new Swiper(".swiper-container", {
+          new Swiper(".time-card", {
             slidesPerView: 4,
             spaceBetween: 10
           });
@@ -106,6 +107,9 @@ export default {
           return "周日" + date;
       }
     }
+  },
+  components: {
+    SelectSeatList: () => import("./components/SelectSeatList")
   }
 };
 </script>
@@ -130,7 +134,6 @@ export default {
     font-size: 13px;
   }
   .swiper-container {
-    padding-bottom: 10px;
     background-color: #fff;
     .swiper-slide {
       background-color: hsla(0, 0%, 95.7%, 0.6);

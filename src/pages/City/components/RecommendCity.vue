@@ -11,7 +11,12 @@
     <div class="hot-city">
       <div class="city-index-title">热门城市</div>
       <ul class="city-index-detail">
-        <li class="city-item-detail" v-for="item of hotList" :key="item.cityId">
+        <li
+          class="city-item-detail"
+          v-for="item of hotList"
+          :key="item.cityId"
+          @click="hotCityClick(item)"
+        >
           {{ item.name }}
         </li>
       </ul>
@@ -30,6 +35,11 @@ export default {
     cityName: {
       type: String,
       default: ""
+    }
+  },
+  methods: {
+    hotCityClick(data) {
+      this.$emit("cityClick", data);
     }
   }
 };

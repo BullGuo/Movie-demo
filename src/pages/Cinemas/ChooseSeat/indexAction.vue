@@ -14,10 +14,22 @@
       :ticket-list="$route.params.ticketList"
       v-if="$route.params.ticketList.length"
     />
-    <seating-chart :seating-chart="seatingChart" />
-    <action-card :card-detail="infoDetail" @changeTiming="changeTiming" />
+    <seating-chart
+      :seating-chart="seatingChart"
+      ref="seatingChart"
+      @getSeatList="getSeatList"
+    />
+    <action-card
+      :card-detail="infoDetail"
+      :selected-seat-list="selectedSeatList"
+      :ticket-list="$route.params.ticketList"
+      @changeTiming="changeTiming"
+    />
     <a class="buy-ticket" @click="buyTicketClick">
-      <span style="color: hsla(0, 0%, 100%, 0.3);">请先选座</span>
+      <span
+        :style="selectedSeatList.length ? '' : 'color:hsla(0, 0%, 100%, 0.3)'"
+        >{{ selectedSeatList.length ? "确认选座" : "请先选座" }}</span
+      >
     </a>
   </div>
 </template>
@@ -28,7 +40,8 @@ export default {
   data() {
     return {
       infoDetail: {},
-      seatingChart: {}
+      seatingChart: {},
+      selectedSeatList: []
     };
   },
   created() {
@@ -53,7 +66,7 @@ export default {
         }
       });
       // 座位列表
-      this.$axios({
+      return this.$axios({
         url: `https://m.maizuo.com/gateway/`,
         params: { ...params },
         headers: {
@@ -76,6 +89,10 @@ export default {
       });
       await this.init(data);
       this.$Toast.clear();
+      this.$refs.seatingChart.changeTime();
+    },
+    getSeatList(list) {
+      this.selectedSeatList = [...list];
     },
     buyTicketClick() {
       console.log(1111111);

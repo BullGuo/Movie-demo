@@ -7,6 +7,7 @@ import "vant/lib/index.css";
 import { Toast } from "vant";
 import axios from "axios";
 import "./common/utils/rem";
+import { EventBus } from "../src/common/utils/EventBus";
 import moment from "moment";
 import VueTouch from "vue-touch";
 // var VueTouch = require("vue-touch");
@@ -18,6 +19,7 @@ Vue.use(VueTouch, { name: "v-touch" });
 Vue.prototype.$Toast = Toast;
 Vue.prototype.$axios = axios;
 Vue.prototype.$moment = moment;
+Vue.prototype.$bus = new EventBus();
 
 new Vue({
   router,

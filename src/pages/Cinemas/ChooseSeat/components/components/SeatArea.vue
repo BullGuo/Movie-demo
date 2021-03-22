@@ -15,7 +15,7 @@
         height: thumbnailHeightRem + 'rem'
       }"
     >
-      <!--红色外框开始-->
+      <!--红色外框-->
       <div
         class="thumbnail-border"
         :style="{
@@ -24,7 +24,6 @@
           left: leftThumbnail + 'rem'
         }"
       />
-      <!--红色外框结束-->
       <slot name="thumbnail-seat-slot">
         <!--这里是缩略图中的所有座位放入此插槽-->
       </slot>
@@ -145,13 +144,13 @@ export default {
   data() {
     return {
       scale: 1, // 区域放大尺寸
-      top: 0, // 单位rem
-      left: 0, // 单位rem
+      top: 0, // 座位图位移
+      left: 0,
       thumbnailShow: false, // 缩略图是否显示
       startX: 0, // ---移动的起点X轴 单位px
       startY: 0, // ---移动的起点Y轴 单位px
-      topThumbnail: 0, // 单位rem
-      leftThumbnail: 0, // 单位rem
+      topThumbnail: 0, // 缩略图红色外框位移
+      leftThumbnail: 0,
       // 设备 rem计算值
       screenRem:
         (document.body.clientWidth ||
@@ -166,6 +165,12 @@ export default {
     };
   },
   methods: {
+    // 切换时间场次时，初始化缩略图与放大比例
+    init() {
+      this.scale = 1;
+      this.left = this.top = this.leftThumbnail = this.topThumbnail = 0;
+      this.thumbnailShow = this.touchStatus = false;
+    },
     // 第一次点击座位改变放大比例
     changeScale: function() {
       if (this.maxScale === 1) return;
@@ -387,6 +392,7 @@ export default {
     padding-top: 50px;
     position: absolute;
     z-index: 0;
+    transition: transform 0.5s;
   }
   .seat-tool-parent {
     overflow: hidden;
