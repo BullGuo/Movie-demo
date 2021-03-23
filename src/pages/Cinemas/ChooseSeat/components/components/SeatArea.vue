@@ -1,6 +1,14 @@
 <template>
-  <div
+  <v-touch
+    @pinchout="pinchOut"
+    @pinchin="pinchIn"
+    @panmove="panMove"
+    @panstart="panStart"
+    @panend="panEnd"
+    ref="pinchAndPan"
     class="activity-area"
+    :pinch-options="{ threshold: 0.09 }"
+    :pan-options="{ threshold: 0.01 }"
     :style="{
       width: seatAreaWidthRem + 'rem',
       height: seatAreaHeightRem + 'rem'
@@ -25,19 +33,12 @@
         }"
       />
       <slot name="thumbnail-seat-slot">
-        <!--这里是缩略图中的所有座位放入此插槽-->
+        <!--缩略图中所有座位-->
       </slot>
     </div>
-    <v-touch
-      @pinchout="pinchOut"
-      @pinchin="pinchIn"
-      @panmove="panMove"
-      @panstart="panStart"
-      @panend="panEnd"
+    <div
       class="box"
       ref="pinchAndPan"
-      :pinch-options="{ threshold: 0.09 }"
-      :pan-options="{ threshold: 0.01 }"
       :style="{
         transform: 'scale(' + scale + ')',
         transformOrigin: transformOrigin,
@@ -48,9 +49,9 @@
       }"
     >
       <slot name="seat-area-slot">
-        <!--所有可以点击座位的数据会放入此插槽,此插槽可以缩放,拖动-->
+        <!--所有可以点击座位的数据-->
       </slot>
-    </v-touch>
+    </div>
     <!--座位左边栏-->
     <div
       class="seat-tool-parent"
@@ -79,7 +80,7 @@
         </template>
       </div>
     </div>
-  </div>
+  </v-touch>
 </template>
 
 <script>
@@ -135,7 +136,7 @@ export default {
       type: [Number, String],
       default: null
     },
-    // 座位左边栏的数组
+    // 座位左边栏数组
     seatToolArr: {
       type: Array,
       default: () => []
@@ -146,9 +147,9 @@ export default {
       scale: 1, // 区域放大尺寸
       top: 0, // 座位图位移
       left: 0,
-      thumbnailShow: false, // 缩略图是否显示
-      startX: 0, // ---移动的起点X轴 单位px
-      startY: 0, // ---移动的起点Y轴 单位px
+      thumbnailShow: false, // 是否显示缩略图
+      startX: 0, // ---移动的起点X轴 单位px  用于拖动时候计算开始坐标
+      startY: 0,
       topThumbnail: 0, // 缩略图红色外框位移
       leftThumbnail: 0,
       // 设备 rem计算值
@@ -157,7 +158,7 @@ export default {
           window.innerWidth ||
           document.documentElement.clientWidth) / 10,
       // 项目 rem计算值
-      pxtorem: 75,
+      pxToRem: 75,
       // 定时器对象
       timer: {},
       // 触摸状态
@@ -182,37 +183,25 @@ export default {
       // 0.67是上方 屏幕方向dom 部分偏移的部分 也是 .box margin-top 的50px
       this.top = top * (this.scale - 1) + 0.67;
       this.left = left * (this.scale - 1);
-      this.showThumbnail();
-      this.setThumbnailFrame();
+      this.showThumbnail(); // 展示缩略图
+      this.setThumbnailFrame(); // 计算缩略图位移值
     },
     // seat-tool 内的字体大小
     seatToolFontSize() {
-      let fontsize = 20 / this.pxtorem;
+      let fontsize = 20 / this.pxToRem;
       return fontsize * this.scale;
     },
-    // 当缩放 放大的时候触发
+    // 放大时触发
     pinchOut() {
       if (this.scale >= 0 && this.scale < this.maxScale) {
         this.scale += 0.1;
       }
     },
-    // 当缩放 缩小的时候触发
+    // 缩小时触发
     pinchIn() {
       if (this.scale > 1) {
         this.scale -= 0.1;
       }
-    },
-    // 计算缩略图位移值
-    setThumbnailFrame() {
-      // .seatBox的高和缩略图的高 换算比例
-      let heightProportion =
-        (this.seatBoxHeight * this.seatScale) / this.thumbnailHeightRem;
-      // .seatBox的宽和缩略图的宽 换算比例
-      let widthProportion = this.seatAreaWidthRem / this.thumbnailWidthRem;
-      // 本次缩略图移动横纵坐标rem的值
-      this.topThumbnail = (-this.top / heightProportion) * this.scaleReciprocal;
-      this.leftThumbnail =
-        (-this.left / widthProportion) * this.scaleReciprocal;
     },
     // 当手指拖动的过程中
     panMove(ev) {
@@ -220,12 +209,12 @@ export default {
         // 本次座位图移动横纵坐标rem的值
         this.top = (ev.deltaY + this.startY) / this.screenRem;
         this.left = (ev.deltaX + this.startX) / this.screenRem;
-        this.setThumbnailFrame();
+        this.setThumbnailFrame(); // 计算缩略图位移值
       }
     },
     // 当手指拖动开始的时候
     panStart() {
-      this.showThumbnail();
+      this.showThumbnail(); // 显示缩略图
       // 获取上次记录的xy坐标作为起点
       this.startY = this.top * this.screenRem;
       this.startX = this.left * this.screenRem;
@@ -234,35 +223,62 @@ export default {
     panEnd() {
       // 优化触摸性能
       this.touchStatus = false;
+      // 计算可移动边界
       if (this.scale === 1) {
-        this.top = 0;
-        this.left = 0;
-        this.topThumbnail = 0;
-        this.leftThumbnail = 0;
+        // 座位图左右移动超过了边界值 把移动置为边界值
+        if (this.left > 6.15) {
+          this.left = 6.15;
+        } else if (this.left < -6.027) {
+          this.left = -6.027;
+        }
+        // 缩略图左右移动超过了边界值 把移动置为边界值
+        if (this.leftThumbnail > 1.416) {
+          this.leftThumbnail = 1.416;
+        } else if (this.leftThumbnail < -1.4477) {
+          this.leftThumbnail = -1.4477;
+        }
+        // 座位图上下移动超过了边界值 把移动置为边界值
+        if (this.top > 5.92) {
+          this.top = 5.92;
+        } else if (this.top < -5.15) {
+          this.top = -5.15;
+        }
+        // 缩略图上下移动超过了边界值 把移动置为边界值
+        if (this.topThumbnail > 0.8385) {
+          this.topThumbnail = 0.8385;
+        } else if (this.topThumbnail < -0.6124) {
+          this.topThumbnail = -0.6124;
+        }
       } else {
-        // 如果宽度度移动超过了边界值 把移动置为边界值
-        if (this.left > this.crossLeft) {
-          this.left = this.crossLeft;
-        } else if (this.left < -this.crossLeft) {
-          this.left = -this.crossLeft;
+        // 座位图左右移动超过了边界值 把移动置为边界值
+        if (this.left - this.crossLeft > 6) {
+          this.left = this.crossLeft + 6;
+        } else if (this.left + this.crossLeft < -6.123) {
+          this.left = -this.crossLeft - 6.123;
         }
-        // 缩略图移动超过了边界值 把移动置为边界值
-        if (this.leftThumbnail > this.thumbnailWidthRemProportion) {
-          this.leftThumbnail = this.thumbnailWidthRemProportion;
-        } else if (this.leftThumbnail < -this.thumbnailWidthRemProportion) {
-          this.leftThumbnail = -this.thumbnailWidthRemProportion;
+        // 缩略图左右移动超过了边界值 把移动置为边界值
+        if (this.leftThumbnail - this.thumbnailWidthRemProportion > 1.0435) {
+          this.leftThumbnail = this.thumbnailWidthRemProportion + 0.8;
+        } else if (
+          this.leftThumbnail + this.thumbnailWidthRemProportion <
+          -0.76
+        ) {
+          this.leftThumbnail = -this.thumbnailWidthRemProportion - 0.76;
         }
-        // 如果高度移动超过了边界值 把移动置为边界值
-        if (this.top > this.crossTop) {
-          this.top = this.crossTop;
-        } else if (this.top < -this.crossTop) {
-          this.top = -this.crossTop;
+        // 座位图上下移动超过了边界值 把移动置为边界值
+        if (this.top - this.crossTop > 3.45) {
+          this.top = this.crossTop + 3.45;
+        } else if (this.top + this.crossTop < -7.49) {
+          this.top = -this.crossTop - 7.49;
         }
-        // 缩略图移动超过了边界值 把移动置为边界值
-        if (this.topThumbnail > this.thumbnailHeightRemProportion) {
-          this.topThumbnail = this.thumbnailHeightRemProportion;
-        } else if (this.topThumbnail < -this.thumbnailHeightRemProportion) {
-          this.topThumbnail = -this.thumbnailHeightRemProportion;
+        // 缩略图上下移动超过了边界值 把移动置为边界值
+        if (this.topThumbnail - this.thumbnailHeightRemProportion > 0.97) {
+          this.topThumbnail = this.thumbnailHeightRemProportion + 0.7;
+        } else if (
+          this.topThumbnail + this.thumbnailHeightRemProportion <
+          -0.743
+        ) {
+          this.topThumbnail = -this.thumbnailHeightRemProportion - 0.7;
         }
       }
       this.timer = setTimeout(() => {
@@ -276,6 +292,18 @@ export default {
       // 展示缩略图
       this.thumbnailShow = true;
       clearTimeout(this.timer);
+    },
+    // 计算缩略图位移值
+    setThumbnailFrame() {
+      // .seatBox的高和缩略图的高 换算比例
+      let heightProportion =
+        (this.seatBoxHeight * this.seatScale) / this.thumbnailHeightRem;
+      // .seatBox的宽和缩略图的宽 换算比例
+      let widthProportion = this.seatAreaWidthRem / this.thumbnailWidthRem;
+      // 本次缩略图移动横纵坐标rem的值
+      this.topThumbnail = (-this.top / heightProportion) * this.scaleReciprocal;
+      this.leftThumbnail =
+        (-this.left / widthProportion) * this.scaleReciprocal;
     }
   },
   computed: {
@@ -297,13 +325,23 @@ export default {
         height
       );
     },
-    // css样式控制.seat-tool缩放中心点
-    transformOriginTool() {
-      return "0 " + +this.scaleYCross * 100 + "%";
+    // 座位区缩放中心点
+    transformOrigin() {
+      return this.scaleXCross * 100 + "%" + this.scaleYCross * 100 + "%";
     },
-    // 缩放.box区域 y轴的中心点
+    // 座位区x轴的中心点
+    scaleXCross() {
+      return (this.middleLine / this.seatAreaWidthRem) * this.seatScale;
+    },
+    // 座位区y轴的中心点
     scaleYCross() {
       return (this.horizontalLine / this.seatAreaHeightRem) * this.seatScale;
+    },
+    // 侧边栏缩放中心点
+    transformOriginTool() {
+      return (
+        "0 " + +(this.scaleYCross * 100 - (+this.scale - 1) * 52.564875) + "%"
+      );
     },
     // 左边触边吸附边界值rem
     crossLeft() {
@@ -316,14 +354,6 @@ export default {
     // 最大放大比例
     maxScale() {
       return 1 + 1 / this.seatScale;
-    },
-    // css样式控制.box缩放中心点
-    transformOrigin() {
-      return this.scaleXCross * 100 + "%" + this.scaleYCross * 100 + "%";
-    },
-    // 缩放.box区域 x轴的中心点
-    scaleXCross() {
-      return (this.middleLine / this.seatAreaWidthRem) * this.seatScale;
     },
     // scale的倒数
     scaleReciprocal() {
@@ -360,6 +390,7 @@ export default {
       height: 100%;
       padding: 1px;
       position: relative;
+      transition: transform 0.5s;
       &::after {
         content: "";
         pointer-events: none;
@@ -368,7 +399,8 @@ export default {
         left: 0;
         top: 0;
         transform-origin: 0 0;
-        border: 2px solid red;
+        border: 1px solid #fe8233;
+        background-color: rgba(254, 130, 51, 0.18);
         border-radius: 0;
         box-sizing: border-box;
         width: 100%;

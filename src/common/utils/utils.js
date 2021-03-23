@@ -1,3 +1,6 @@
+/**
+ * 异步加载script
+ */
 export function asyncLoadScript({ id, src, type = "async" }) {
   return new Promise((resolve, reject) => {
     if (id && document.getElementById(id)) return resolve();

@@ -1,7 +1,7 @@
 <template>
   <div class="schedule">
     <div
-      class="schedule-item"
+      :class="['schedule-item', item.isOnsell ? '' : 'disable']"
       v-for="(item, index) in schedulesList"
       :key="index"
       @click="chooseSeat(item)"
@@ -19,7 +19,7 @@
         <div class="hall">{{ item.hallName }}</div>
       </div>
       <div class="right">
-        <div class="buy-ticket">购票</div>
+        <div class="buy-ticket">{{ item.isOnsell ? "购票" : "停售" }}</div>
         <div class="lowest-price">
           <span class="price-icon">￥</span>
           <span>{{ item.salePrice / 100 }}</span>
@@ -124,6 +124,9 @@ export default {
       }
     }
   }
+}
+.disable {
+  color: #d2d6dc !important;
 }
 </style>
 <style>

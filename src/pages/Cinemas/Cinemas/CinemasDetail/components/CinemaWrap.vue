@@ -35,7 +35,11 @@ export default {
       this.$emit("update:showClose", true);
     },
     goToNavigation() {
-      console.log(this.detail);
+      // 跳转导航
+      this.$router.push({
+        name: "cinema_navigation",
+        params: { cinemaDetail: this.detail }
+      });
     }
   }
 };
