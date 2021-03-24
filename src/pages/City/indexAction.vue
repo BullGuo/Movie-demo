@@ -29,7 +29,7 @@
 <script>
 import { asyncLoadScript } from "@/common/utils/utils";
 const mapSrc =
-  "https://webapi.amap.com/maps?v=1.4.15&key=31d2705ea862611c04a817de8b96ad85&plugin=AMap.CitySearch";
+  "https://webapi.amap.com/maps?v=1.4.15&key=31d2705ea862611c04a817de8b96ad85";
 let AMap;
 export default {
   name: "indexAction",
@@ -90,24 +90,26 @@ export default {
       await asyncLoadScript({ id: "map", src: mapSrc });
       AMap = AMap || window.AMap;
       //实例化城市查询类
-      let citysearch = new AMap.CitySearch();
-      //根据用户IP返回当前城市
-      citysearch.getLocalCity((status, result) => {
-        if (status === "complete" && result.info === "OK") {
-          if (result && result.city && result.bounds) {
-            setTimeout(() => {
-              this.$store.commit("setCityInfo", {
-                cityID: result.adcode,
-                name: result.city
-              });
-              this.cityInfo.name = result.city;
-              this.cityInfo.cityId = result.adcode;
-              this.$Toast.clear();
-            }, 1000);
+      AMap.plugin("AMap.CitySearch", () => {
+        let citysearch = new AMap.CitySearch();
+        //根据用户IP返回当前城市
+        citysearch.getLocalCity((status, result) => {
+          if (status === "complete" && result.info === "OK") {
+            if (result && result.city && result.bounds) {
+              setTimeout(() => {
+                this.$store.commit("setCityInfo", {
+                  cityID: result.adcode,
+                  name: result.city
+                });
+                this.cityInfo.name = result.city;
+                this.cityInfo.cityId = result.adcode;
+                this.$Toast.clear();
+              }, 1000);
+            }
+          } else {
+            this.$Toast.loading("位置信息获取失败");
           }
-        } else {
-          this.$Toast.loading("位置信息获取失败");
-        }
+        });
       });
     },
     // 将城市数据根据首字母排序
