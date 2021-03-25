@@ -1,26 +1,36 @@
 <template>
   <div class="navigation">
     <top-navigation @changeWay="changeWay" :cinema-detail="cinemaDetail" />
-    <div id="container">
-      <img
-        src="../img/refresh.png"
-        alt=""
-        class="refresh-icon"
-        @click="refreshMap"
-      />
-      <img
-        src="../img/center_location.png"
-        class="center-icon"
-        @click="centerMap"
-      />
-    </div>
+    <div
+      id="container"
+      :style="{
+        height: projectList.length ? 'calc(100% - 240px)' : 'calc(100% - 130px)'
+      }"
+    />
+    <img
+      src="../img/refresh.png"
+      class="refresh-icon"
+      @click="refreshMap"
+      v-if="activeName != 'transit'"
+    />
+    <img
+      src="../img/center_location.png"
+      class="center-icon"
+      @click="centerMap"
+      v-if="activeName != 'transit'"
+    />
     <!-- 公交路线 -->
     <transit-list
       v-if="activeName == 'transit'"
       :transit-list="transitList"
       :notTransit="notTransit"
     />
-    <!--    <div @click="handleClick">查看全部地图</div>-->
+    <bottom-navigation
+      :drive-project="projectList"
+      :active-name="activeName"
+      @changeType="changeType"
+      @arouseTheGold="arouseTheGold"
+    />
   </div>
 </template>
 
@@ -36,11 +46,16 @@ export default {
       cinemaDetail: {}, // 目标点信息
       map: null,
       location: { lng: null, lat: null }, // 当前位置
-      mapBounds: null, // 获取路线后的地图视图范围
+      nowDetail: null, // 当前位置详情
+      mapCenter: null, // 获取路线后的地图中心点
       geolocation: null, // 当前位置map实例
       activeName: "drive",
       transitList: [], // 公交导航路线方案
-      notTransit: false // 没有公交路线时
+      projectList: [], // 驾车,骑行,步行路线方案
+      notTransit: false, // 没有公交路线时
+      hot_drive: null, // 推荐驾车路线(默认路线)
+      hot_transit: null, // 推荐公交路线(默认路线)
+      hot_walking: null // 推荐步行路线(默认路线)
     };
   },
   created() {
@@ -49,30 +64,26 @@ export default {
   methods: {
     init() {
       this.cinemaDetail = this.$route.params.cinemaDetail || {};
-      console.log(this.cinemaDetail);
       this.changeWay(this.activeName);
     },
+    // 更改导航方式 [驾车,公交,骑行,步行]
     async changeWay(data) {
       this.activeName = data;
       if (data != "transit") {
         this.transitList = [];
       }
+      this.projectList = [];
       await this.getLocationInfo();
-      switch (data) {
-        case "drive":
-          this.getDrivePath();
-          break;
-        case "transit":
-          this.getTransitPath();
-          break;
-        case "riding":
-          this.getRidingPath();
-          break;
-        case "walk":
-          this.getWalkPath();
-          break;
-      }
+      let type = data.replace(data[0], data[0].toUpperCase());
+      this[`get${type}Path`]();
       this.$Toast.clear();
+    },
+    changeType(data) {
+      this.hot_drive.clear();
+      this.map.clearMap();
+      let projectArr = ["LEAST_TIME", "LEAST_DISTANCE"];
+      let type = data.type.replace(data.type[0], data.type[0].toUpperCase());
+      this[`get${type}Path`](projectArr[data.index], data.type);
     },
     // 获取当前精准定位
     async getLocationInfo() {
@@ -98,6 +109,7 @@ export default {
             if (status == "complete") {
               resolve();
               this.location = { ...result.position };
+              this.nowDetail = { ...result };
             } else {
               reject();
               if (result.info == "NOT_SUPPORTED") {
@@ -114,28 +126,78 @@ export default {
       });
     },
     // 获取驾车路径
-    getDrivePath() {
-      //构造路线导航类
+    getDrivePath(policy = "LEAST_TIME", type = "") {
+      // 异步加载插件
       AMap.plugin("AMap.Driving", () => {
-        //异步加载插件
-        let driving = new AMap.Driving({
+        // 构造路线导航类
+        this.hot_drive = new AMap.Driving({
           map: this.map,
-          policy: AMap.DrivingPolicy.LEAST_TIME, // 驾车路线规划策略，AMap.DrivingPolicy.LEAST_TIME是最快捷模式
           autoFitView: true, // 控制在路径规划结束后，自动调整地图视野使绘制的路线处于视口的可见范围
           isOutline: true, // 是否显示描边
           outlineColor: "#5074b6"
         });
+        // 设置驾车路线规划策略
+        this.hot_drive.setPolicy(AMap.DrivingPolicy[policy]);
         // 根据起终点经纬度规划驾车导航路线
-        driving.search(...this.getStartEnd, (status, result) => {
+        this.hot_drive.search(...this.getStartEnd, (status, result) => {
           if (status !== "complete") {
             this.$Toast.fail({
               message: "获取驾车数据失败" + result
             });
           } else {
-            this.mapBounds = this.map.getBounds();
+            this.getMapCenterZoom();
+            if (type != this.activeName) {
+              this.projectList.push(result.routes[0]);
+            }
+          }
+        });
+        let projectArr = ["LEAST_TIME", "LEAST_DISTANCE"];
+        let otherProject = projectArr.find(item => item != policy);
+        // 导航备用方案
+        let driving_two = new AMap.Driving();
+        driving_two.setPolicy(AMap.DrivingPolicy[otherProject]);
+        // 绘制备用路线
+        driving_two.search(...this.getStartEnd, (status, result) => {
+          if (status == "complete") {
+            if (type != this.activeName) {
+              this.projectList.push(result.routes[0]);
+            }
+            this.handlePolyline(result.routes[0].steps);
           }
         });
       });
+    },
+    // 构造备用路线
+    handlePolyline(arr) {
+      let pathArr = [];
+      arr.map(item => {
+        pathArr.push(item.path);
+        return pathArr;
+      });
+      let path = this.flatten(pathArr);
+      // 绘制轨迹
+      const polyline = new AMap.Polyline({
+        map: this.map,
+        path,
+        strokeColor: "#C0D3EB", // 线颜色
+        strokeOpacity: 1, // 线透明度
+        strokeWeight: 7, // 线宽
+        strokeStyle: "solid", // 线样式
+        lineJoin: "round", // 折线拐点样式
+        isOutline: true,
+        outlineColor: "#5074b6"
+      });
+      polyline.setMap(this.map);
+    },
+    // 扁平化坐标数组
+    flatten(arr) {
+      const result = [];
+      for (let i = 0; i < arr.length; i++) {
+        for (let j = 0; j < arr[i].length; j++) {
+          result.push(arr[i][j]);
+        }
+      }
+      return result;
     },
     // 获取公交路径
     getTransitPath() {
@@ -150,22 +212,22 @@ export default {
           isOutline: true, // 是否显示描边
           outlineColor: "#3a5484"
         };
-        let transfer = new AMap.Transfer(transferOption);
+        this.hot_transit = new AMap.Transfer(transferOption);
         //根据起、终点坐标查询公交换乘路线
-        transfer.search(...this.getStartEnd, (status, result) => {
+        this.hot_transit.search(...this.getStartEnd, (status, result) => {
           if (status === "complete") {
             this.transitList = [...result.plans];
-            this.mapBounds = this.map.getBounds();
+            this.getMapCenterZoom();
           } else if (status === "error") {
             this.$Toast.fail("公交路线数据查询失败" + result);
           } else {
             this.$Toast.fail("暂无路线！");
-            this.mapBounds = this.map.getBounds();
+            this.getMapCenterZoom();
           }
         });
       });
     },
-    // 获取公交路径
+    // 获取骑行路径
     getRidingPath() {
       AMap.plugin("AMap.Riding", () => {
         let ridingOption = {
@@ -180,7 +242,8 @@ export default {
           if (status !== "complete") {
             this.$Toast.fail("骑行路线数据查询失败" + result);
           } else {
-            this.mapBounds = this.map.getBounds();
+            this.projectList.push(result.routes[0]);
+            this.getMapCenterZoom();
           }
         });
       });
@@ -195,18 +258,13 @@ export default {
           autoFitView: true
         };
         // 步行导航
-        let walking = new AMap.Walking(walkOption);
+        this.hot_walking = new AMap.Walking(walkOption);
         //根据起终点坐标规划步行路线
-        walking.search(...this.getStartEnd, (status, result) => {
-          console.log(result);
+        this.hot_walking.search(...this.getStartEnd, (status, result) => {
           if (status !== "complete") {
             this.$Toast.fail("步行路线数据查询失败" + result);
           } else {
-            let time = result.routes[0].time;
-            let hour = Math.floor(time / 3600);
-            let minute = Math.ceil(time / 60) - hour * 60;
-            console.log(hour);
-            console.log(minute);
+            this.projectList.push(result.routes[0]);
             if (result.routes[0].distance / 1000 >= 10) {
               this.$Toast({
                 message: "距离过长，建议公交或驾车出行",
@@ -214,19 +272,39 @@ export default {
                 duration: 3000
               });
             }
-            this.mapBounds = this.map.getBounds();
+            this.getMapCenterZoom();
           }
         });
       });
     },
+    // 获取地图层级与中心点
+    getMapCenterZoom() {
+      this.mapCenter = this.map.getCenter();
+    },
     // 刷新
     refreshMap() {
-      this.map.setBounds(this.mapBounds);
+      this.map.setZoomAndCenter(12, this.mapCenter);
     },
     // 锁定当前位置
     centerMap() {
       if (!this.location.lng || !this.location.lat) return;
       this.map.setCenter([this.location.lng, this.location.lat]);
+    },
+    // 唤起高德
+    arouseTheGold(data) {
+      if (data == "riding") {
+        this.$Toast.fail("骑行暂不支持唤起高德地图");
+        return;
+      }
+      this[`hot_${data}`].searchOnAMAP({
+        origin: new AMap.LngLat(this.location.lng, this.location.lat),
+        originName: this.nowDetail.formattedAddress,
+        destination: new AMap.LngLat(
+          this.cinemaDetail.longitude,
+          this.cinemaDetail.latitude
+        ),
+        destinationName: this.cinemaDetail.name
+      });
     },
     inLoading() {
       this.$Toast.loading({
@@ -247,6 +325,7 @@ export default {
   },
   components: {
     TopNavigation: () => import("./components/TopNavigation"),
+    BottomNavigation: () => import("./components/BottomNavigation"),
     TransitList: () => import("./components/TransitList")
   }
 };
@@ -256,25 +335,26 @@ export default {
 .navigation {
   position: relative;
   overflow: hidden;
+  > img {
+    position: absolute;
+    right: 12px;
+    z-index: 99999;
+  }
+  .refresh-icon {
+    right: 20px;
+    bottom: 222px;
+    width: 30px;
+    height: 30px;
+    z-index: 9999;
+  }
+  .center-icon {
+    bottom: 166px;
+    width: 45px;
+    height: 45px;
+  }
   #container {
-    height: calc(100% - 130px);
+    height: calc(100% - 240px);
     position: relative;
-    > img {
-      position: absolute;
-      right: 12px;
-      z-index: 9;
-    }
-    .refresh-icon {
-      right: 20px;
-      bottom: 112px;
-      width: 30px;
-      height: 30px;
-    }
-    .center-icon {
-      bottom: 55px;
-      width: 45px;
-      height: 45px;
-    }
     /deep/ .amap-logo {
       display: none !important;
     }

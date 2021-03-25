@@ -24,7 +24,8 @@
         :class="['tabs-item', item.key == activeName ? 'tabs-item-active' : '']"
         @click="handleChange(item.key)"
       >
-        {{ item.name }}
+        <img :src="item.key | topIconFilter" alt="" />
+        <span>{{ item.name }}</span>
       </div>
     </div>
   </div>
@@ -56,6 +57,20 @@ export default {
       if (this.activeName == name) return;
       this.activeName = name;
       this.$emit("changeWay", name);
+    }
+  },
+  filters: {
+    topIconFilter(data) {
+      switch (data) {
+        case "drive":
+          return require("../../img/drive-icon.png");
+        case "transit":
+          return require("../../img/transit-icon.png");
+        case "riding":
+          return require("../../img/riding-icon.png");
+        case "walk":
+          return require("../../img/walk-icon.png");
+      }
     }
   }
 };
@@ -138,9 +153,15 @@ export default {
     text-align: center;
     margin: 10px 10px;
     .tabs-item {
-      width: 50px;
+      width: 60px;
       border-radius: 12px;
       color: black;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      > img {
+        width: 20px;
+      }
     }
     .tabs-item-active {
       background-color: #0a70f6;
