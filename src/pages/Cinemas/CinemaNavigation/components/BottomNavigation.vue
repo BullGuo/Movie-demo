@@ -1,13 +1,19 @@
 <template>
-  <div class="bottom-navigation" v-if="driveProject.length">
-    <div class="bottom-navigation-type">
+  <div
+    :class="['bottom-navigation', driveProject.length == 1 ? 'top-filter' : '']"
+    v-if="driveProject.length"
+  >
+    <div class="bottom-navigation-type" v-if="driveProject.length >= 2">
       <div
         v-for="(item, index) in driveProject"
         :key="index"
         @click="changeType(index)"
         :class="index == 0 && driveProject.length != 1 ? 'type-border' : ''"
       >
-        <div :class="activeNum == index ? 'active active-title' : ''">
+        <div
+          :class="activeNum == index ? 'active active-title' : ''"
+          :style="{ visibility: driveProject.length == 1 ? 'hidden' : '' }"
+        >
           {{ index == 0 ? "推荐方案" : "方案二" }}
         </div>
         <div :class="['time', activeNum == index ? 'active' : '']">
@@ -18,14 +24,31 @@
         </div>
       </div>
     </div>
-    <div class="bottom-navigation-info">
-      <!--      <div class="navigation" style="background-color: white;color: black">-->
-      <!--        去骑车-->
-      <!--      </div>-->
-      <div class="navigation" @click="$emit('arouseTheGold', activeName)">
+    <div class="bottom-navigation-filter" v-else>
+      <div class="time-filter">
+        {{ driveProject[0].time | timeFilter }}
+      </div>
+      <div>
+        {{ driveProject[0].distance | distanceFilter }}
+      </div>
+    </div>
+    <div
+      :class="[
+        'bottom-navigation-info',
+        driveProject.length == 1 ? 'bottom-navigation-info-filter' : ''
+      ]"
+    >
+      <div class="navigation" @click="handleNavigation">
         {{ bottomName + "导航" }}
       </div>
     </div>
+    <van-action-sheet
+      v-model="isShow"
+      :actions="actions"
+      cancel-text="取消"
+      close-on-click-action
+      @select="handleSelect"
+    />
   </div>
 </template>
 
@@ -63,7 +86,9 @@ export default {
   data() {
     return {
       activeNum: 0,
-      bottomName: ""
+      bottomName: "",
+      isShow: false,
+      actions: [{ name: "高德地图" }]
     };
   },
   methods: {
@@ -71,6 +96,16 @@ export default {
       if (this.activeNum == index) return;
       this.activeNum = index;
       this.$emit("changeType", { index: index, type: "drive" });
+    },
+    handleNavigation() {
+      if (this.activeName == "riding") {
+        this.$Toast.fail("骑行暂不支持唤起高德地图");
+        return;
+      }
+      this.isShow = true;
+    },
+    handleSelect() {
+      this.$emit("arouseTheGold", this.activeName);
     }
   },
   filters: {
@@ -134,7 +169,6 @@ export default {
     color: white;
     height: 35px;
     line-height: 35px;
-    /*justify-content: space-between;*/
     justify-content: center;
     .navigation {
       width: 150px;
@@ -143,5 +177,21 @@ export default {
       border: 1px solid #eae2e2;
     }
   }
+  .bottom-navigation-info-filter {
+    margin-top: 0;
+  }
+  .bottom-navigation-filter {
+    flex-direction: column;
+    text-align: left;
+    color: #626365;
+    .time-filter {
+      font-size: 20px;
+      font-weight: bold;
+      color: black;
+    }
+  }
+}
+.top-filter {
+  height: 110px;
 }
 </style>

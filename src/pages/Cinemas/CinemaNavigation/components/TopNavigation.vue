@@ -8,7 +8,7 @@
           <img src="../../img/big-center.png" alt="" class="dot-center" />
           <img src="../../img/big-bottom.png" alt="" class="dot-big" />
         </div>
-        <div class="top-right-info">
+        <div class="top-right-info" @click="handleClick">
           <div class="right-start">我的位置</div>
           <div class="right-end">{{ cinemaDetail.name }}</div>
         </div>
@@ -57,6 +57,9 @@ export default {
       if (this.activeName == name) return;
       this.activeName = name;
       this.$emit("changeWay", name);
+    },
+    handleClick() {
+      this.$Toast.fail("抱歉，暂不支持自定义导航！");
     }
   },
   filters: {

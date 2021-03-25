@@ -15,7 +15,11 @@
       />
     </div>
     <div v-show="!searchList.length">
-      <recommend-city :hot-list="hotList" :city-name="cityInfo.name" />
+      <recommend-city
+        :hot-list="hotList"
+        :city-name="cityInfo.name"
+        @cityClick="cityClick"
+      />
       <city-index-bar :data-detail="dataDetail" @cityClick="cityClick" />
     </div>
     <search-city-list
@@ -107,7 +111,7 @@ export default {
               }, 1000);
             }
           } else {
-            this.$Toast.loading("位置信息获取失败");
+            this.$Toast.fail("位置信息获取失败");
           }
         });
       });

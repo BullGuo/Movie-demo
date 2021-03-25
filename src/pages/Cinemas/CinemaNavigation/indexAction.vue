@@ -4,7 +4,11 @@
     <div
       id="container"
       :style="{
-        height: projectList.length ? 'calc(100% - 240px)' : 'calc(100% - 130px)'
+        height: projectList.length
+          ? projectList.length == 1
+            ? 'calc(100% - 200px)'
+            : 'calc(100% - 240px)'
+          : 'calc(100% - 130px)'
       }"
     />
     <img
@@ -141,9 +145,7 @@ export default {
         // 根据起终点经纬度规划驾车导航路线
         this.hot_drive.search(...this.getStartEnd, (status, result) => {
           if (status !== "complete") {
-            this.$Toast.fail({
-              message: "获取驾车数据失败" + result
-            });
+            this.$Toast.fail("获取驾车数据失败");
           } else {
             this.getMapCenterZoom();
             if (type != this.activeName) {
@@ -219,7 +221,7 @@ export default {
             this.transitList = [...result.plans];
             this.getMapCenterZoom();
           } else if (status === "error") {
-            this.$Toast.fail("公交路线数据查询失败" + result);
+            this.$Toast.fail("公交路线数据查询失败");
           } else {
             this.$Toast.fail("暂无路线！");
             this.getMapCenterZoom();
@@ -240,7 +242,7 @@ export default {
         //根据起终点坐标规划骑行路线
         riding.search(...this.getStartEnd, (status, result) => {
           if (status !== "complete") {
-            this.$Toast.fail("骑行路线数据查询失败" + result);
+            this.$Toast.fail("骑行路线数据查询失败");
           } else {
             this.projectList.push(result.routes[0]);
             this.getMapCenterZoom();
@@ -262,7 +264,7 @@ export default {
         //根据起终点坐标规划步行路线
         this.hot_walking.search(...this.getStartEnd, (status, result) => {
           if (status !== "complete") {
-            this.$Toast.fail("步行路线数据查询失败" + result);
+            this.$Toast.fail("步行路线数据查询失败");
           } else {
             this.projectList.push(result.routes[0]);
             if (result.routes[0].distance / 1000 >= 10) {
@@ -292,10 +294,6 @@ export default {
     },
     // 唤起高德
     arouseTheGold(data) {
-      if (data == "riding") {
-        this.$Toast.fail("骑行暂不支持唤起高德地图");
-        return;
-      }
       this[`hot_${data}`].searchOnAMAP({
         origin: new AMap.LngLat(this.location.lng, this.location.lat),
         originName: this.nowDetail.formattedAddress,
@@ -305,6 +303,7 @@ export default {
         ),
         destinationName: this.cinemaDetail.name
       });
+      return false;
     },
     inLoading() {
       this.$Toast.loading({
@@ -314,6 +313,19 @@ export default {
         message: "加载中"
       });
     }
+  },
+  beforeRouteLeave(to, from, next) {
+    console.log(to);
+    console.log(1111111111111111);
+    if (to.name != "cinemas_detail") {
+      next(false);
+    } else {
+      this.$Toast.clear();
+      next();
+    }
+  },
+  beforeDestroy() {
+    console.log(222222222222222);
   },
   computed: {
     getStartEnd() {
