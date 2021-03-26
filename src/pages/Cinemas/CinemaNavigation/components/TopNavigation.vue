@@ -1,7 +1,7 @@
 <template>
   <div class="top-navigation">
     <div class="top-info">
-      <van-icon name="arrow-left" class="top-left" />
+      <van-icon name="arrow-left" class="top-left" @click="$router.go(-1)" />
       <div class="top-right">
         <div class="top-right-dot">
           <img src="../../img/big-top.png" alt="" class="dot-big" />
@@ -9,11 +9,11 @@
           <img src="../../img/big-bottom.png" alt="" class="dot-big" />
         </div>
         <div class="top-right-info" @click="handleClick">
-          <div class="right-start">我的位置</div>
+          <div class="right-start">{{ startName }}</div>
           <div class="right-end">{{ cinemaDetail.name }}</div>
         </div>
         <div class="top-right-exchange">
-          <img src="../../img/exchange.png" alt="" />
+          <img src="../../img/exchange.png" alt="" @click="handleExchange" />
         </div>
       </div>
     </div>
@@ -48,7 +48,9 @@ export default {
         { name: "骑行", key: "riding" },
         { name: "步行", key: "walk" }
       ],
-      activeName: "drive"
+      activeName: "drive",
+      startName: "我的位置",
+      lastTime: null // 保存上一次点击时间，防止点击过快
     };
   },
   methods: {
@@ -60,6 +62,19 @@ export default {
     },
     handleClick() {
       this.$Toast.fail("抱歉，暂不支持自定义导航！");
+    },
+    handleExchange() {
+      if (this.lastTime && new Date().getTime() - this.lastTime <= 1500) {
+        this.$Toast.fail("点击过快，请稍后点击!");
+        return;
+      }
+      this.$Toast.clear();
+      this.lastTime = new Date().getTime();
+      [this.startName, this.cinemaDetail.name] = [
+        this.cinemaDetail.name,
+        this.startName
+      ];
+      this.$emit("exchangeLocation");
     }
   },
   filters: {
@@ -87,8 +102,9 @@ export default {
     display: flex;
     .top-left {
       font-size: 20px;
-      margin-top: 20px;
-      margin-right: 10px;
+      /*margin-top: 20px;*/
+      /*margin-right: 10px;*/
+      margin: 20px 10px 27px 0;
     }
     .top-right {
       width: 300px;

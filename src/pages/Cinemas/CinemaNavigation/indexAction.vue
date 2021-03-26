@@ -1,6 +1,12 @@
 <template>
   <div class="navigation">
-    <top-navigation @changeWay="changeWay" :cinema-detail="cinemaDetail" />
+    <top-navigation
+      @changeWay="changeWay"
+      :cinema-detail="cinemaDetail"
+      @exchangeLocation="exchangeLocation"
+      ref="topNavigation"
+      v-if="!isShowTransDetail"
+    />
     <div
       id="container"
       :style="{
@@ -8,6 +14,8 @@
           ? projectList.length == 1
             ? 'calc(100% - 200px)'
             : 'calc(100% - 240px)'
+          : isShowTransDetail
+          ? '54%'
           : 'calc(100% - 130px)'
       }"
     />
@@ -25,10 +33,13 @@
     />
     <!-- 公交路线 -->
     <transit-list
-      v-if="activeName == 'transit'"
+      v-if="activeName == 'transit' && !isShowTransDetail"
       :transit-list="transitList"
       :notTransit="notTransit"
+      @showTransDetail="showTransDetail"
     />
+    <transit-detail v-if="isShowTransDetail" :transit-detail="transitDetail" />
+    <!-- 底部方案与唤起地图app -->
     <bottom-navigation
       :drive-project="projectList"
       :active-name="activeName"
@@ -52,6 +63,8 @@ export default {
       location: { lng: null, lat: null }, // 当前位置
       nowDetail: null, // 当前位置详情
       mapCenter: null, // 获取路线后的地图中心点
+      mapBounds: null,
+      mapZoom: null,
       geolocation: null, // 当前位置map实例
       activeName: "drive",
       transitList: [], // 公交导航路线方案
@@ -59,7 +72,10 @@ export default {
       notTransit: false, // 没有公交路线时
       hot_drive: null, // 推荐驾车路线(默认路线)
       hot_transit: null, // 推荐公交路线(默认路线)
-      hot_walking: null // 推荐步行路线(默认路线)
+      hot_walking: null, // 推荐步行路线(默认路线)
+      drivePolicy: "LEAST_TIME", // 保留上一次选择的路线方案(推荐,方案二)
+      isShowTransDetail: false, // 是否显示公交导航详情
+      transitDetail: null // 公交导航详情
     };
   },
   created() {
@@ -75,6 +91,7 @@ export default {
       this.activeName = data;
       if (data != "transit") {
         this.transitList = [];
+        this.isShowTransDetail = false;
       }
       this.projectList = [];
       await this.getLocationInfo();
@@ -82,12 +99,18 @@ export default {
       this[`get${type}Path`]();
       this.$Toast.clear();
     },
+    // 更改推荐路线方案
     changeType(data) {
       this.hot_drive.clear();
       this.map.clearMap();
       let projectArr = ["LEAST_TIME", "LEAST_DISTANCE"];
       let type = data.type.replace(data.type[0], data.type[0].toUpperCase());
-      this[`get${type}Path`](projectArr[data.index], data.type);
+      this.drivePolicy = projectArr[data.index];
+      if (data.type == "drive") {
+        this[`get${type}Path`](projectArr[data.index], data.type);
+      } else {
+        this[`get${type}Path`]();
+      }
     },
     // 获取当前精准定位
     async getLocationInfo() {
@@ -147,7 +170,7 @@ export default {
           if (status !== "complete") {
             this.$Toast.fail("获取驾车数据失败");
           } else {
-            this.getMapCenterZoom();
+            // this.getMapCenterZoom();
             if (type != this.activeName) {
               this.projectList.push(result.routes[0]);
             }
@@ -164,28 +187,30 @@ export default {
             if (type != this.activeName) {
               this.projectList.push(result.routes[0]);
             }
-            this.handlePolyline(result.routes[0].steps);
+            let pathArr = [];
+            result.routes[0].steps.map(item => {
+              pathArr.push(item.path);
+              return pathArr;
+            });
+            let path = this.flatten(pathArr);
+            this.handlePolyline(path);
           }
         });
       });
     },
     // 构造备用路线
-    handlePolyline(arr) {
-      let pathArr = [];
-      arr.map(item => {
-        pathArr.push(item.path);
-        return pathArr;
-      });
-      let path = this.flatten(pathArr);
+    handlePolyline(path, strokeColor = "#C0D3EB", showDir = false) {
       // 绘制轨迹
       const polyline = new AMap.Polyline({
         map: this.map,
         path,
-        strokeColor: "#C0D3EB", // 线颜色
+        strokeColor: strokeColor, // 线颜色
         strokeOpacity: 1, // 线透明度
         strokeWeight: 7, // 线宽
         strokeStyle: "solid", // 线样式
         lineJoin: "round", // 折线拐点样式
+        lineCap: "round", // 折线两段线帽样式
+        showDir: showDir,
         isOutline: true,
         outlineColor: "#5074b6"
       });
@@ -205,26 +230,26 @@ export default {
     getTransitPath() {
       AMap.plugin("AMap.Transfer", () => {
         let transferOption = {
-          map: this.map,
+          // map: this.map,
           city: this.cinemaDetail.cityName, // 必填
           nightflag: true, // 是否计算夜班车
           extensions: "all", // 返回全部信息
           autoFitView: true,
-          policy: AMap.TransferPolicy.LEAST_TIME, // 换成策略
-          isOutline: true, // 是否显示描边
-          outlineColor: "#3a5484"
+          policy: AMap.TransferPolicy.LEAST_TIME // 换成策略
+          // isOutline: true, // 是否显示描边
+          // outlineColor: "#3a5484"
         };
         this.hot_transit = new AMap.Transfer(transferOption);
         //根据起、终点坐标查询公交换乘路线
         this.hot_transit.search(...this.getStartEnd, (status, result) => {
           if (status === "complete") {
             this.transitList = [...result.plans];
-            this.getMapCenterZoom();
+            // this.getMapCenterZoom();
           } else if (status === "error") {
             this.$Toast.fail("公交路线数据查询失败");
           } else {
             this.$Toast.fail("暂无路线！");
-            this.getMapCenterZoom();
+            // this.getMapCenterZoom();
           }
         });
       });
@@ -245,7 +270,7 @@ export default {
             this.$Toast.fail("骑行路线数据查询失败");
           } else {
             this.projectList.push(result.routes[0]);
-            this.getMapCenterZoom();
+            // this.getMapCenterZoom();
           }
         });
       });
@@ -274,18 +299,21 @@ export default {
                 duration: 3000
               });
             }
-            this.getMapCenterZoom();
+            // this.getMapCenterZoom();
           }
         });
       });
     },
     // 获取地图层级与中心点
     getMapCenterZoom() {
-      this.mapCenter = this.map.getCenter();
+      this.mapZoom = this.map.getZoom();
     },
     // 刷新
     refreshMap() {
-      this.map.setZoomAndCenter(12, this.mapCenter);
+      if (!this.mapBounds) {
+        this.mapBounds = this.map.getBounds();
+      }
+      this.map.setBounds(this.mapBounds);
     },
     // 锁定当前位置
     centerMap() {
@@ -294,16 +322,32 @@ export default {
     },
     // 唤起高德
     arouseTheGold(data) {
-      this[`hot_${data}`].searchOnAMAP({
-        origin: new AMap.LngLat(this.location.lng, this.location.lat),
-        originName: this.nowDetail.formattedAddress,
-        destination: new AMap.LngLat(
-          this.cinemaDetail.longitude,
-          this.cinemaDetail.latitude
-        ),
-        destinationName: this.cinemaDetail.name
-      });
-      return false;
+      let mode = "";
+      switch (data) {
+        case "drive":
+          mode = "car";
+          break;
+        case "transit":
+          mode = "bus";
+          break;
+        case "riding":
+          mode = "ride";
+          break;
+        case "walk":
+          mode = "walk";
+          break;
+      }
+      window.location.href = `https//uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},哈哈哈&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},嘿嘿嘿&mode=${mode}&policy=1&callnative=1`;
+      // this[`hot_${data}`].searchOnAMAP({
+      //   origin: new AMap.LngLat(this.location.lng, this.location.lat),
+      //   originName: this.nowDetail.formattedAddress,
+      //   destination: new AMap.LngLat(
+      //     this.cinemaDetail.longitude,
+      //     this.cinemaDetail.latitude
+      //   ),
+      //   destinationName: this.cinemaDetail.name
+      // });
+      // return false;
     },
     inLoading() {
       this.$Toast.loading({
@@ -312,20 +356,52 @@ export default {
         className: "toast",
         message: "加载中"
       });
+    },
+    // 交换当前与目标点位置
+    exchangeLocation() {
+      let locationLng = this.location.lng;
+      let locationLat = this.location.lat;
+      this.location.lng = this.cinemaDetail.longitude;
+      this.location.lat = this.cinemaDetail.latitude;
+      this.cinemaDetail.longitude = locationLng;
+      this.cinemaDetail.latitude = locationLat;
+      let projectArr = ["LEAST_TIME", "LEAST_DISTANCE"];
+      this.projectList = [];
+      let index = projectArr.findIndex(item => item == this.drivePolicy);
+      this.hot_drive.clear();
+      this.map.clearMap();
+      let type = this.activeName.replace(
+        this.activeName[0],
+        this.activeName[0].toUpperCase()
+      );
+      this.drivePolicy = this.activeName;
+      if (this.activeName == "drive") {
+        this[`get${type}Path`](projectArr[index], "");
+      } else {
+        this[`get${type}Path`]();
+      }
+    },
+    showTransDetail(data) {
+      this.transitDetail = data;
+      this.isShowTransDetail = true;
+      this.handlePolyline(data.path, "#D3256D", true);
+      this.map.setFitView();
     }
   },
+  // 当进入公交导航详情时，点击返回，阻止返回，回退到公交列表
   beforeRouteLeave(to, from, next) {
-    console.log(to);
-    console.log(1111111111111111);
-    if (to.name != "cinemas_detail") {
+    if (this.isShowTransDetail) {
+      this.isShowTransDetail = false;
+      // 返回后保留tabs栏选中值
+      this.$nextTick(() => {
+        this.$refs.topNavigation.activeName = this.activeName;
+      });
+
       next(false);
     } else {
+      next(true);
       this.$Toast.clear();
-      next();
     }
-  },
-  beforeDestroy() {
-    console.log(222222222222222);
   },
   computed: {
     getStartEnd() {
@@ -338,7 +414,8 @@ export default {
   components: {
     TopNavigation: () => import("./components/TopNavigation"),
     BottomNavigation: () => import("./components/BottomNavigation"),
-    TransitList: () => import("./components/TransitList")
+    TransitList: () => import("./components/TransitList"),
+    transitDetail: () => import("./components/transitDetail")
   }
 };
 </script>

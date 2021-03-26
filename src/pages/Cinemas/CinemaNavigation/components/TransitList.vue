@@ -71,7 +71,7 @@ export default {
   },
   methods: {
     goToNavigation(data) {
-      console.log(data);
+      this.$emit("showTransDetail", data);
     }
   },
   filters: {

@@ -25,7 +25,10 @@
                   //首次按键，提示‘再按一次退出应用’
                   if (!first) {
                     first = new Date().getTime();
-                    console.log("再按一次退出应用");
+                    this.$Toast({
+                      message: "再按一次退出应用",
+                      position: "bottom"
+                    });
                     setTimeout(function() {
                       first = null;
                     }, 1000);

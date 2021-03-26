@@ -57,7 +57,7 @@ export default {
         if (!val || !val.name || !val.cityId) return;
         this.$store.commit("setCityInfo", val);
         setTimeout(() => {
-          this.$router.push({ name: "menu" });
+          this.$router.go(-1);
         }, 1000);
       }
     }
@@ -100,9 +100,13 @@ export default {
         citysearch.getLocalCity((status, result) => {
           if (status === "complete" && result.info === "OK") {
             if (result && result.city && result.bounds) {
+              // 由于手机卡根据IP定位最高只能到省，因此采用此种方式
+              let city = this.cityList.find(
+                item => result.city.indexOf(item.name) != -1
+              );
               setTimeout(() => {
                 this.$store.commit("setCityInfo", {
-                  cityID: result.adcode,
+                  cityID: city.cityId,
                   name: result.city
                 });
                 this.cityInfo.name = result.city;

@@ -8,14 +8,18 @@
       <top-poster />
       <film-info />
       <actor-list />
-      <stage-photo :show-stage-photo.sync="showStagePhoto" />
+      <stage-photo :show-stage-photo.sync="showStagePhoto" ref="stagePhoto" />
       <buy-ticket
         v-if="
           $store.state.film_detail.isPresale || $store.state.film_detail.isSale
         "
       />
     </div>
-    <stage-photo-detail v-else :show-stage-photo.sync="showStagePhoto" />
+    <stage-photo-detail
+      v-else
+      :show-stage-photo.sync="showStagePhoto"
+      ref="stagePhotoDetail"
+    />
   </div>
 </template>
 
@@ -52,15 +56,25 @@ export default {
         })
         .then(() => {
           this.$router.replace({ name: "film" });
-          console.log(1111);
-        })
-        .catch(() => {
-          console.log(2222);
         });
     }
   },
   beforeDestroy() {
     this.$store.commit("setTabs", true);
+  },
+  // 当打开剧照详情时，物理返回不应回到电影列表
+  beforeRouteLeave(to, from, next) {
+    if (this.showStagePhoto) {
+      if (!this.$refs.stagePhotoDetail.isPreviewImg) {
+        this.showStagePhoto = false;
+      }
+      next(false);
+    } else if (this.$refs.stagePhoto.isPreviewImg) {
+      this.$refs.stagePhoto.isPreviewImg = false;
+      next(false);
+    } else {
+      next();
+    }
   },
   components: {
     TopHeader: () => import("./components/TopHeader"),

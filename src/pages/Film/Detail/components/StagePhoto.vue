@@ -43,16 +43,25 @@ export default {
       default: false
     }
   },
+  data() {
+    return {
+      isPreviewImg: false // 是否预览图片
+    };
+  },
   methods: {
     photosAllClick() {
       this.$emit("update:showStagePhoto", true);
     },
     previewImg(index) {
+      this.isPreviewImg = true;
       ImagePreview({
         images: this.$store.state.film_detail.photos,
         startPosition: index,
         closeable: true,
-        closeIconPosition: "top-left"
+        closeIconPosition: "top-left",
+        onClose() {
+          this.isPreviewImg = false;
+        }
       });
     }
   },

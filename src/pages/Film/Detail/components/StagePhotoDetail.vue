@@ -24,16 +24,25 @@ export default {
   props: {
     showStagePhoto: Boolean
   },
+  data() {
+    return {
+      isPreviewImg: false // 是否预览图片
+    };
+  },
   methods: {
     goBack() {
       this.$emit("update:showStagePhoto", false);
     },
     previewImg(index) {
+      this.isPreviewImg = true;
       ImagePreview({
         images: this.$store.state.film_detail.photos,
         startPosition: index,
         closeable: true,
-        closeIconPosition: "top-left"
+        closeIconPosition: "top-left",
+        onClose: () => {
+          this.isPreviewImg = false;
+        }
       });
     }
   }

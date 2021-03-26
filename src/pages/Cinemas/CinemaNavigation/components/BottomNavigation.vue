@@ -98,10 +98,10 @@ export default {
       this.$emit("changeType", { index: index, type: "drive" });
     },
     handleNavigation() {
-      if (this.activeName == "riding") {
-        this.$Toast.fail("骑行暂不支持唤起高德地图");
-        return;
-      }
+      // if (this.activeName == "riding") {
+      //   this.$Toast.fail("骑行暂不支持唤起高德地图");
+      //   return;
+      // }
       this.isShow = true;
     },
     handleSelect() {
