@@ -16,3 +16,6 @@ body /deep/ .van-toast--top {
   background-color: #eafcfe;
   color: #474343;
 }
+body /deep/ .van-toast--bottom {
+  bottom: 12%;
+}

@@ -31,7 +31,7 @@
               : 'bottom-subway-down',
             'bottom-subway'
           ]"
-          :style="{ '--height': item.via_stops.length * 30 + 'px' }"
+          :style="{ '--height': item.via_stops.length * 40 + 'px' }"
           @click="iconClick(item, index)"
         >
           <span class="subway-list">乘坐{{ item.via_stops.length + 1 }}站</span>
@@ -205,6 +205,11 @@ export default {
         position: absolute;
         left: -30px;
         top: 0px;
+        width: 20px;
+        height: 20px;
+        transform: translateZ(10px);
+        /*background-image: url("../../img/metro.png");*/
+        /*background-size: 20px 20px;*/
         > img {
           width: 20px;
           height: 20px;
@@ -213,14 +218,17 @@ export default {
     }
     .left-after-bg {
       position: relative;
+      /*transform-style: preserve-3d;*/
       &:before {
+        /*overflow: visible;*/
+        /*transform: translateZ(-1px);*/
         position: absolute;
         content: "";
-        left: -30px;
+        left: -25px;
         top: 0;
         width: 10px;
         height: calc(100% + 54px);
-        background-color: black;
+        background-color: #d3256d;
       }
     }
   }

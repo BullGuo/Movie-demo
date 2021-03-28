@@ -37,11 +37,14 @@ export default {
     }
   },
   watch: {
-    async id(val) {
-      this.active = 0;
-      await this.init();
-      if (!val.cinemaId || !val.filmId) return;
-      this.getScheduleList();
+    id: {
+      immediate: true,
+      async handler(val) {
+        this.active = 0;
+        await this.init();
+        if (!val.cinemaId || !val.filmId) return;
+        this.getScheduleList();
+      }
     },
     active: {
       handler(val) {

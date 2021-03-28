@@ -50,6 +50,13 @@ export default {
   },
   methods: {
     chooseSeat(data) {
+      if (!data.isOnsell) {
+        this.$Toast({
+          message: "当前场次已经停止售票，请选择其他场次",
+          position: "bottom"
+        });
+        return;
+      }
       this.$router.push({
         name: "schedule",
         params: {
