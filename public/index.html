@@ -21,7 +21,7 @@
               let first = null;
               plus.key.addEventListener(
                 "backbutton",
-                function() {
+                () => {
                   //首次按键，提示‘再按一次退出应用’
                   if (!first) {
                     first = new Date().getTime();
@@ -45,10 +45,10 @@
         });
       });
     </script>
-    <!--    <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>-->
-    <!--    <script>-->
-    <!--      new VConsole();-->
-    <!--    </script>-->
+    <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
+    <script>
+      new VConsole();
+    </script>
   </head>
   <body>
     <noscript>

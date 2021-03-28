@@ -62,7 +62,8 @@ export default {
     init() {
       let arr = [];
       this.$moment.lang("zh-cn");
-      if (!this.detail.showDate.length) return;
+      if (!this.detail && !this.detail.showDate && !this.detail.showDate.length)
+        return;
       for (let index in this.detail.showDate) {
         let day = this.$moment(this.detail.showDate[index] * 1000).format(
           "M月D日"

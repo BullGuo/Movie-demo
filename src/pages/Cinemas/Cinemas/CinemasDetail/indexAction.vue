@@ -47,7 +47,9 @@ export default {
         }
       }).then(res => {
         if (res && res.data.msg == "ok") {
-          this.detail = { ...res.data.data.cinema };
+          if (res.data.data.cinema) {
+            this.detail = { ...res.data.data.cinema };
+          }
         }
       });
     },

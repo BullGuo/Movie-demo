@@ -7,28 +7,31 @@
         }"
       />
     </div>
-    <div class="swiper-container">
-      <div class="swiper-wrapper">
-        <img
-          class="swiper-slide"
-          v-for="item of list"
-          :src="item.poster"
-          alt=""
-          :key="item.filmId"
-        />
+    <div v-if="list.length">
+      <div class="swiper-container">
+        <div class="swiper-wrapper">
+          <img
+            class="swiper-slide"
+            v-for="item of list"
+            :src="item.poster"
+            alt=""
+            :key="item.filmId"
+          />
+        </div>
       </div>
+      <div class="triangle">
+        <img src="../img/triangle.png" alt="" />
+      </div>
+      <film-detail :detail="list[activeIndex] ? list[activeIndex] : {}" />
+      <date-list
+        :id="{
+          cinemaId: cinemaId,
+          filmId: list[activeIndex] ? list[activeIndex].filmId : ''
+        }"
+        :detail="list[activeIndex] ? list[activeIndex] : {}"
+      />
     </div>
-    <div class="triangle">
-      <img src="../img/triangle.png" alt="" />
-    </div>
-    <film-detail :detail="list[activeIndex] ? list[activeIndex] : {}" />
-    <date-list
-      :id="{
-        cinemaId: cinemaId,
-        filmId: list[activeIndex] ? list[activeIndex].filmId : ''
-      }"
-      :detail="list[activeIndex] ? list[activeIndex] : {}"
-    />
+    <van-empty v-else description="暂无场次" :image="emptyImg" />
   </div>
 </template>
 
@@ -45,7 +48,8 @@ export default {
     return {
       list: [],
       activeIndex: 0,
-      filmId: ""
+      filmId: "",
+      emptyImg: require("../img/no-warp.png")
     };
   },
   created() {
@@ -136,6 +140,10 @@ export default {
       width: 20px;
       height: 10px;
     }
+  }
+  /deep/ .van-empty__image {
+    width: 70px;
+    height: 70px;
   }
 }
 </style>

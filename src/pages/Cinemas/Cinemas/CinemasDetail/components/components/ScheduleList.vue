@@ -1,28 +1,38 @@
 <template>
   <div class="schedule">
     <div
-      :class="['schedule-item', item.isOnsell ? '' : 'disable']"
+      class="schedule-item"
       v-for="(item, index) in schedulesList"
       :key="index"
       @click="chooseSeat(item)"
     >
       <div class="left">
-        <div class="start-at">
+        <div :class="['start-at', item.isOnsell ? '' : 'disable']">
           {{ $moment(item.showAt * 1000).format("LT") }}
         </div>
-        <div class="end-at">
+        <div :class="['end-at', item.isOnsell ? '' : 'disable']">
           {{ $moment(item.endAt * 1000).format("LT") + "散场" }}
         </div>
       </div>
       <div class="center">
-        <div class="language">{{ item.filmLanguage }}</div>
-        <div class="hall">{{ item.hallName }}</div>
+        <div :class="['language', item.isOnsell ? '' : 'disable']">
+          {{ item.filmLanguage }}
+        </div>
+        <div :class="['hall', item.isOnsell ? '' : 'disable']">
+          {{ item.hallName }}
+        </div>
       </div>
       <div class="right">
-        <div class="buy-ticket">{{ item.isOnsell ? "购票" : "停售" }}</div>
+        <div :class="['buy-ticket', item.isOnsell ? '' : 'disable']">
+          {{ item.isOnsell ? "购票" : "停售" }}
+        </div>
         <div class="lowest-price">
-          <span class="price-icon">￥</span>
-          <span>{{ item.salePrice / 100 }}</span>
+          <span :class="['price-icon', item.isOnsell ? '' : 'disable']"
+            >￥</span
+          >
+          <span :class="item.isOnsell ? '' : 'disable'">{{
+            item.salePrice / 100
+          }}</span>
         </div>
       </div>
     </div>
@@ -124,9 +134,23 @@ export default {
       }
     }
   }
+  &:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 100%;
+    height: 1px;
+    color: #ededed;
+    border-bottom: 1px solid #ededed;
+  }
 }
 .disable {
   color: #d2d6dc !important;
+  &:after {
+    border: 1px solid #d2d6dc !important;
+  }
 }
 </style>
 <style>
