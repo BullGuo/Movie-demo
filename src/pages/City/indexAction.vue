@@ -54,7 +54,7 @@ export default {
     cityInfo: {
       deep: true,
       handler(val) {
-        if (!val || !val.name || !val.cityID) return;
+        if (!val || !val.name || (!val.cityID && !val.cityId)) return;
         this.$store.commit("setCityInfo", val);
         setTimeout(() => {
           this.$router.go(-1);
