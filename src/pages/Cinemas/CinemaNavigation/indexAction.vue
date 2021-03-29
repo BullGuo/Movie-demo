@@ -134,6 +134,7 @@ export default {
           this.map.addControl(this.geolocation);
           this.geolocation.getCurrentPosition((status, result) => {
             if (status == "complete") {
+              console.log(result);
               resolve();
               this.location = { ...result.position };
               this.nowDetail = { ...result };
@@ -228,6 +229,7 @@ export default {
     },
     // 获取公交路径
     getTransitPath() {
+      console.log(this.cinemaDetail);
       AMap.plugin("AMap.Transfer", () => {
         let transferOption = {
           // map: this.map,
@@ -235,13 +237,16 @@ export default {
           nightflag: true, // 是否计算夜班车
           extensions: "all", // 返回全部信息
           autoFitView: true,
-          policy: AMap.TransferPolicy.LEAST_TIME // 换成策略
+          policy: AMap.TransferPolicy.LEAST_TIME, // 换成策略
+          cityd: this.cinemaDetail.cityId
           // isOutline: true, // 是否显示描边
           // outlineColor: "#3a5484"
         };
         this.hot_transit = new AMap.Transfer(transferOption);
         //根据起、终点坐标查询公交换乘路线
         this.hot_transit.search(...this.getStartEnd, (status, result) => {
+          console.log(status);
+          console.log(result);
           if (status === "complete") {
             this.transitList = [...result.plans];
             // this.getMapCenterZoom();
@@ -337,7 +342,11 @@ export default {
           mode = "walk";
           break;
       }
-      window.location.href = `https//uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},哈哈哈&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},嘿嘿嘿&mode=${mode}&policy=1&callnative=1`;
+      window.open(
+        `https://uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},哈哈哈&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},嘿嘿嘿&mode=${mode}&policy=1&callnative=1`,
+        "_blank"
+      );
+      // window.location.href = `https//uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},哈哈哈&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},嘿嘿嘿&mode=${mode}&policy=1&callnative=1`;
       // this[`hot_${data}`].searchOnAMAP({
       //   origin: new AMap.LngLat(this.location.lng, this.location.lat),
       //   originName: this.nowDetail.formattedAddress,
