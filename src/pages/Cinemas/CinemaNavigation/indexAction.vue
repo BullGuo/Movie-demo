@@ -347,9 +347,17 @@ export default {
           mode = "walk";
           break;
       }
-      console.log(mode);
-      location.href = `https://uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},我的位置&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},${this.cinemaDetail.name}&callnative=1`;
-      // window.location.href = `https://uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},哈哈哈&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},${this.cinemaDetail.name}&mode=${mode}&policy=1&callnative=1`;
+      window.location.href = `https//uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},哈哈哈&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},嘿嘿嘿&mode=${mode}&policy=1&callnative=1`;
+      // this[`hot_${data}`].searchOnAMAP({
+      //   origin: new AMap.LngLat(this.location.lng, this.location.lat),
+      //   originName: this.nowDetail.formattedAddress,
+      //   destination: new AMap.LngLat(
+      //     this.cinemaDetail.longitude,
+      //     this.cinemaDetail.latitude
+      //   ),
+      //   destinationName: this.cinemaDetail.name
+      // });
+      // return false;
     },
     inLoading() {
       this.$Toast.loading({
@@ -426,20 +434,6 @@ export default {
 .navigation {
   position: relative;
   overflow: hidden;
-  .arrow-left {
-    position: absolute;
-    left: 12px;
-    top: 15px;
-    z-index: 99;
-    font-size: 24px;
-    width: 35px;
-    height: 35px;
-    border-radius: 10px;
-    background-color: #fff;
-    text-align: center;
-    padding-top: 4px;
-    border: 1px solid #ded4d4;
-  }
   > img {
     position: absolute;
     right: 12px;
