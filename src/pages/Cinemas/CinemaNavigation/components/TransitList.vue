@@ -166,8 +166,6 @@ export default {
         }
         .metro-class {
           border: 2px solid #d97ba3;
-          /*background-color: #d3256d;*/
-          /*color: white;*/
           color: #d3256d;
         }
         .type-icon {

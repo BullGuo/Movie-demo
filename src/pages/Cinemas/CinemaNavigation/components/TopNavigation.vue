@@ -102,8 +102,6 @@ export default {
     display: flex;
     .top-left {
       font-size: 20px;
-      /*margin-top: 20px;*/
-      /*margin-right: 10px;*/
       margin: 20px 10px 27px 0;
     }
     .top-right {

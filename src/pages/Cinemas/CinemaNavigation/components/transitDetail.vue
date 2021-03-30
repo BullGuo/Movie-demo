@@ -5,7 +5,14 @@
       <div class="top-distance">
         步行{{ transitDetail.walking_distance | distanceFilter }}
       </div>
-      <div></div>
+      <div class="top-bus">
+        <div v-for="(item, index) in busList" :key="index">
+          <img :src="item.type | busIconFilter" alt="" />
+          <div :class="item.type == 'bus' ? 'transit-class' : 'metro-class'">
+            {{ item.text }}
+          </div>
+        </div>
+      </div>
     </div>
     <div class="transit-detail-bottom">
       <div class="title">我的位置</div>
@@ -23,6 +30,7 @@
         <div class="icon-left" v-if="item.type">
           <img :src="item.type | busIconFilter" alt="" />
         </div>
+        <div>{{ item.subway_line }}</div>
         <div
           v-if="item.type == 'subway' && item.isStart"
           :class="[
@@ -41,11 +49,12 @@
             color="#626365"
             class="up-down-icon"
           />
-          <div v-for="arr of item.via_stops" :key="arr.id">
+          <div v-for="arr of item.via_stops" :key="arr.id" class="subway-list">
             {{ arr.name }}
           </div>
         </div>
       </div>
+      <div class="title">{{ cinemaDetail.name }}</div>
     </div>
   </div>
 </template>
@@ -57,6 +66,10 @@ export default {
     transitDetail: {
       type: Object,
       default: () => {}
+    },
+    cinemaDetail: {
+      type: Object,
+      default: () => {}
     }
   },
   watch: {
@@ -65,11 +78,12 @@ export default {
       immediate: true,
       handler(val) {
         if (!val) return;
-        // this.segmentsList = [...val.segments];
+        console.log(val);
         let aList = [];
         for (let item of val.segments) {
           let walk_des = null;
           let subway_des = null;
+          let bus_des = null;
           switch (item.transit_mode) {
             case "WALK":
               walk_des = item.instruction.split("到达");
@@ -83,6 +97,12 @@ export default {
               aList[aList.length - 1].type = "subway";
               aList[aList.length - 1].isStart = true;
               aList[aList.length - 1].via_stops = [...item.transit.via_stops];
+              bus_des = item.instruction.substring(
+                2,
+                item.instruction.indexOf("号线(") + 2
+              );
+              aList[aList.length - 1].subway_line = bus_des;
+              this.busList.push({ type: "subway", text: bus_des });
               subway_des = item.instruction.split("到达");
               subway_des[0] = { message: subway_des[0] };
               if (subway_des.length > 1) {
@@ -91,26 +111,36 @@ export default {
               aList = aList.concat(subway_des[1]);
               break;
             case "BUS":
+              aList[aList.length - 1].type = "bus";
+              subway_des = item.instruction.split("到达");
+              subway_des[0] = { message: subway_des[0] };
+              if (subway_des.length > 1) {
+                subway_des[1] = { message: subway_des[1] };
+              }
+              aList = aList.concat(subway_des[1]);
+              aList[aList.length - 1].type = "bus";
               break;
           }
         }
         this.infoList = [...aList];
+        console.log(this.infoList);
+        console.log(this.busList);
       }
     }
   },
   data() {
     return {
-      segmentsList: [],
       infoList: [],
       is_up: false,
-      unfoldIndex: null
+      unfoldIndex: null,
+      busList: []
     };
   },
   methods: {
     iconClick(data, index) {
       if (!data.via_stops.length) return;
       this.unfoldIndex = index;
-      this.is_up = !this.is_up;
+      this.is_up = true;
     }
   },
   filters: {
@@ -134,6 +164,8 @@ export default {
         return require("../../img/metro.png");
       } else if (data == "walk") {
         return require("../../img/walk.png");
+      } else if (data == "bus") {
+        return require("../../img/transit.png");
       }
     }
   }
@@ -147,14 +179,15 @@ export default {
   bottom: 0;
   z-index: 9;
   width: 100%;
-  height: 50%;
+  height: 55%;
   background-color: #fff;
   border-radius: 30px 30px 0 0;
   padding: 20px 0 10px;
+  margin-bottom: 12px;
   font-size: 14px;
   overflow-y: auto;
   .transit-detail-top {
-    height: 25%;
+    height: 30%;
     border-bottom: 1px solid #ededed;
     padding: 0 20px;
     .top-time {
@@ -163,6 +196,38 @@ export default {
     }
     .top-distance {
       color: #626365;
+    }
+    .top-bus {
+      overflow: hidden;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+      > div {
+        height: 20px;
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+        img {
+          width: 20px;
+        }
+        div {
+          line-height: 20px;
+          height: 20px;
+          padding: 0 3px 0 15.5px;
+          margin-left: -12.5px;
+          border-radius: 4px;
+          border-left: none !important;
+        }
+        .metro-class {
+          border: 1px solid #d97ba3;
+          color: #d3256d;
+        }
+        .transit-class {
+          border: 1px solid #8eabec;
+          color: #5486ff;
+        }
+      }
     }
   }
   .transit-detail-bottom {
