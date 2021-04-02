@@ -15,24 +15,54 @@
       </div>
     </div>
     <div class="transit-detail-bottom">
-      <div class="title">我的位置</div>
+      <div class="title">
+        <span>我的位置</span>
+        <img src="../../img/start.png" alt="" />
+      </div>
       <div
         v-for="(item, index) of infoList"
         :key="index"
         :class="[
           'bottom-item',
-          item.type != 'walk' && item.isStart ? 'left-after-bg' : ''
+          item.type == 'walk'
+            ? 'walk-margin'
+            : item.isStart
+            ? 'left-after-bg'
+            : ''
         ]"
+        :style="{
+          '--bg':
+            item.type == 'subway'
+              ? '#d3256d'
+              : item.type == 'bus'
+              ? '#5486FF'
+              : ''
+        }"
       >
         <div :class="[item.type == 'walk' ? 'bottom-walk' : 'title']">
           {{ item.message }}
         </div>
-        <div class="icon-left" v-if="item.type">
-          <img :src="item.type | busIconFilter" alt="" />
-        </div>
+        <img
+          v-if="item.type == 'walk'"
+          src="../../img/ellipsis.png"
+          alt=""
+          class="ellipsis-top"
+        />
+        <img
+          v-if="item.type == 'walk'"
+          src="../../img/ellipsis.png"
+          alt=""
+          class="ellipsis-bottom"
+        />
+        <img
+          class="icon-left"
+          v-if="item.type"
+          :src="item.type | busIconFilter"
+          alt=""
+        />
         <div>{{ item.subway_line }}</div>
         <div
-          v-if="item.type == 'subway' && item.isStart"
+          v-if="item.type !== 'walk' && item.isStart"
           :class="[
             is_up && unfoldIndex == index
               ? 'bottom-subway-up'
@@ -54,7 +84,10 @@
           </div>
         </div>
       </div>
-      <div class="title">{{ cinemaDetail.name }}</div>
+      <div class="title">
+        <span>{{ cinemaDetail.name }}</span>
+        <img src="../../img/end.png" alt="" />
+      </div>
     </div>
   </div>
 </template>
@@ -82,8 +115,6 @@ export default {
         let aList = [];
         for (let item of val.segments) {
           let walk_des = null;
-          let subway_des = null;
-          let bus_des = null;
           switch (item.transit_mode) {
             case "WALK":
               walk_des = item.instruction.split("到达");
@@ -94,37 +125,14 @@ export default {
               aList = aList.concat(walk_des);
               break;
             case "SUBWAY":
-              aList[aList.length - 1].type = "subway";
-              aList[aList.length - 1].isStart = true;
-              aList[aList.length - 1].via_stops = [...item.transit.via_stops];
-              bus_des = item.instruction.substring(
-                2,
-                item.instruction.indexOf("号线(") + 2
-              );
-              aList[aList.length - 1].subway_line = bus_des;
-              this.busList.push({ type: "subway", text: bus_des });
-              subway_des = item.instruction.split("到达");
-              subway_des[0] = { message: subway_des[0] };
-              if (subway_des.length > 1) {
-                subway_des[1] = { message: subway_des[1] };
-              }
-              aList = aList.concat(subway_des[1]);
+              aList = this.handleData("subway", item, aList);
               break;
             case "BUS":
-              aList[aList.length - 1].type = "bus";
-              subway_des = item.instruction.split("到达");
-              subway_des[0] = { message: subway_des[0] };
-              if (subway_des.length > 1) {
-                subway_des[1] = { message: subway_des[1] };
-              }
-              aList = aList.concat(subway_des[1]);
-              aList[aList.length - 1].type = "bus";
+              aList = this.handleData("bus", item, aList);
               break;
           }
         }
         this.infoList = [...aList];
-        console.log(this.infoList);
-        console.log(this.busList);
       }
     }
   },
@@ -137,8 +145,37 @@ export default {
     };
   },
   methods: {
+    handleData(key, data, list) {
+      list[list.length - 1].type = key;
+      list[list.length - 1].isStart = true;
+      list[list.length - 1].via_stops = [...data.transit.via_stops];
+      let bus_des = null;
+      if (key == "bus") {
+        bus_des = data.instruction.substring(
+          2,
+          data.instruction.indexOf("路(") + 1
+        );
+      } else {
+        bus_des = data.instruction.substring(
+          2,
+          data.instruction.indexOf("号线(") + 2
+        );
+      }
+      list[list.length - 1].subway_line = bus_des;
+      this.busList.push({ type: key, text: bus_des });
+      let subway_des = data.instruction.split("到达");
+      if (subway_des.length > 1) {
+        subway_des[1] = { message: subway_des[1] };
+      }
+      list = list.concat(subway_des[1]);
+      return list;
+    },
     iconClick(data, index) {
       if (!data.via_stops.length) return;
+      if (this.unfoldIndex == index) {
+        this.is_up = !this.is_up;
+        return;
+      }
       this.unfoldIndex = index;
       this.is_up = true;
     }
@@ -179,7 +216,7 @@ export default {
   bottom: 0;
   z-index: 9;
   width: 100%;
-  height: 55%;
+  height: 52%;
   background-color: #fff;
   border-radius: 30px 30px 0 0;
   padding: 20px 0 10px;
@@ -237,6 +274,14 @@ export default {
     .title {
       font-weight: bold;
       font-size: 16px;
+      position: relative;
+      > img {
+        position: absolute;
+        left: -34px;
+        top: -1px;
+        width: 28px;
+        height: 28px;
+      }
     }
     .bottom-item {
       position: relative;
@@ -266,35 +311,43 @@ export default {
         overflow-y: hidden;
         max-height: var(--height);
       }
+      .ellipsis-top {
+        position: absolute;
+        left: -35px;
+        top: -35px;
+        width: 30px;
+        height: 30px;
+      }
+      .ellipsis-bottom {
+        position: absolute;
+        left: -35px;
+        top: 23px;
+        width: 30px;
+        height: 30px;
+      }
       .icon-left {
         position: absolute;
         left: -30px;
-        top: 0px;
+        top: 0;
         width: 20px;
         height: 20px;
-        transform: translateZ(10px);
-        /*background-image: url("../../img/metro.png");*/
-        /*background-size: 20px 20px;*/
-        > img {
-          width: 20px;
-          height: 20px;
-        }
+        border-radius: 50%;
       }
     }
     .left-after-bg {
-      position: relative;
-      /*transform-style: preserve-3d;*/
       &:before {
-        /*overflow: visible;*/
-        /*transform: translateZ(-1px);*/
         position: absolute;
         content: "";
         left: -25px;
         top: 0;
         width: 10px;
         height: calc(100% + 54px);
-        background-color: #d3256d;
+        background-color: var(--bg);
+        border-radius: 10px;
       }
+    }
+    .walk-margin {
+      margin: 40px 0;
     }
   }
 }

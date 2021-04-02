@@ -15,7 +15,7 @@
             ? 'calc(100% - 200px)'
             : 'calc(100% - 240px)'
           : isShowTransDetail
-          ? '54%'
+          ? '50%'
           : 'calc(100% - 130px)'
       }"
     />
@@ -348,16 +348,6 @@ export default {
           break;
       }
       window.location.href = `https//uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},哈哈哈&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},嘿嘿嘿&mode=${mode}&policy=1&callnative=1`;
-      // this[`hot_${data}`].searchOnAMAP({
-      //   origin: new AMap.LngLat(this.location.lng, this.location.lat),
-      //   originName: this.nowDetail.formattedAddress,
-      //   destination: new AMap.LngLat(
-      //     this.cinemaDetail.longitude,
-      //     this.cinemaDetail.latitude
-      //   ),
-      //   destinationName: this.cinemaDetail.name
-      // });
-      // return false;
     },
     inLoading() {
       this.$Toast.loading({
@@ -394,7 +384,26 @@ export default {
     showTransDetail(data) {
       this.transitDetail = data;
       this.isShowTransDetail = true;
+      this.map.clearMap();
       this.handlePolyline(data.path, "#D3256D", true);
+      let my_marker;
+      my_marker = new AMap.Marker({
+        position: [this.location.lng, this.location.lat],
+        clickable: true,
+        map: this.map,
+        icon: require("../img/start-point.png"),
+        offset: new AMap.Pixel(-20, -45)
+      });
+      my_marker.setTop(true);
+      let my_marker1;
+      my_marker1 = new AMap.Marker({
+        position: [this.cinemaDetail.longitude, this.cinemaDetail.latitude],
+        clickable: true,
+        map: this.map,
+        icon: require("../img/end-point.png"),
+        offset: new AMap.Pixel(-20, -45)
+      });
+      my_marker1.setTop(true);
       this.map.setFitView();
     }
   },
@@ -475,6 +484,21 @@ export default {
     /deep/ .amap-call {
       display: none;
     }
+  }
+  .arrow-left {
+    z-index: 99;
+    font-size: 20px;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    background-color: white;
+    padding-top: 7px;
+    color: black;
+    border-radius: 10px;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    box-shadow: -1px -1px 3px #888888;
   }
 }
 </style>
