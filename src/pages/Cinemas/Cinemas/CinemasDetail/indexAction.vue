@@ -80,7 +80,6 @@ export default {
   transform: translateY(-180px);
 }
 .cinema-schedule {
-  background-color: #fff;
   padding-top: 44px;
   .header-left {
     padding: 10px 0 0 8px;
@@ -88,6 +87,8 @@ export default {
     top: 0;
     font-size: 24px;
     color: rgb(129, 129, 129);
+    width: 100%;
+    background-color: #fff;
   }
   .header-title {
     font-size: 17px;
@@ -100,6 +101,7 @@ export default {
     padding: 0 15px;
     height: 44px;
     line-height: 44px;
+    background-color: #fff;
   }
   .fix-header-title {
     position: fixed;

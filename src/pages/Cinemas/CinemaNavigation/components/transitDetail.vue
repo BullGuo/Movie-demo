@@ -70,15 +70,18 @@
             'bottom-subway'
           ]"
           :style="{ '--height': item.via_stops.length * 40 + 'px' }"
-          @click="iconClick(item, index)"
         >
-          <span class="subway-list">乘坐{{ item.via_stops.length + 1 }}站</span>
-          <van-icon
-            v-if="item.via_stops.length"
-            :name="is_up && unfoldIndex == index ? 'arrow-up' : 'arrow-down'"
-            color="#626365"
-            class="up-down-icon"
-          />
+          <div @click="iconClick(item, index)">
+            <span class="subway-list"
+              >乘坐{{ item.via_stops.length + 1 }}站</span
+            >
+            <van-icon
+              v-if="item.via_stops.length"
+              :name="is_up && unfoldIndex == index ? 'arrow-up' : 'arrow-down'"
+              color="#626365"
+              class="up-down-icon"
+            />
+          </div>
           <div v-for="arr of item.via_stops" :key="arr.id" class="subway-list">
             {{ arr.name }}
           </div>
@@ -111,7 +114,6 @@ export default {
       immediate: true,
       handler(val) {
         if (!val) return;
-        console.log(val);
         let aList = [];
         for (let item of val.segments) {
           let walk_des = null;
@@ -121,6 +123,12 @@ export default {
               walk_des[0] = { message: walk_des[0], type: "walk" };
               if (walk_des.length > 1) {
                 walk_des[1] = { message: walk_des[1] };
+                if (
+                  aList.length &&
+                  walk_des[1].message == aList[aList.length - 1].message
+                ) {
+                  walk_des[0].message = `站内换乘（${walk_des[0].message}）`;
+                }
               }
               aList = aList.concat(walk_des);
               break;
@@ -156,9 +164,13 @@ export default {
           data.instruction.indexOf("路(") + 1
         );
       } else {
+        let arr = [];
+        arr.push(data.instruction.indexOf("号线("));
+        arr.push(data.instruction.indexOf("内环("));
+        arr.push(data.instruction.indexOf("外环("));
         bus_des = data.instruction.substring(
           2,
-          data.instruction.indexOf("号线(") + 2
+          arr.find(item => item != -1) + 2
         );
       }
       list[list.length - 1].subway_line = bus_des;
@@ -166,8 +178,8 @@ export default {
       let subway_des = data.instruction.split("到达");
       if (subway_des.length > 1) {
         subway_des[1] = { message: subway_des[1] };
+        list = list.concat(subway_des[1]);
       }
-      list = list.concat(subway_des[1]);
       return list;
     },
     iconClick(data, index) {

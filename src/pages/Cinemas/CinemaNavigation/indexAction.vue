@@ -71,10 +71,6 @@ export default {
       cinemaDetail: {}, // 目标点信息
       map: null,
       location: { lng: null, lat: null }, // 当前位置
-      nowDetail: null, // 当前位置详情
-      mapCenter: null, // 获取路线后的地图中心点
-      mapBounds: null,
-      mapZoom: null,
       geolocation: null, // 当前位置map实例
       activeName: "drive",
       transitList: [], // 公交导航路线方案
@@ -85,7 +81,8 @@ export default {
       hot_walking: null, // 推荐步行路线(默认路线)
       drivePolicy: "LEAST_TIME", // 保留上一次选择的路线方案(推荐,方案二)
       isShowTransDetail: false, // 是否显示公交导航详情
-      transitDetail: null // 公交导航详情
+      transitDetail: null, // 公交导航详情
+      isExchangeLocation: false
     };
   },
   created() {
@@ -104,7 +101,11 @@ export default {
         this.isShowTransDetail = false;
       }
       this.projectList = [];
-      await this.getLocationInfo();
+      if (!this.isExchangeLocation) {
+        await this.getLocationInfo();
+      } else {
+        this.map.clearMap();
+      }
       let type = data.replace(data[0], data[0].toUpperCase());
       this[`get${type}Path`]();
       this.$Toast.clear();
@@ -133,8 +134,7 @@ export default {
       return new Promise((resolve, reject) => {
         AMap.plugin("AMap.Geolocation", () => {
           this.geolocation = new AMap.Geolocation({
-            enableHighAccuracy: true, //是否使用高精度定位，默认:true
-            timeout: 500, //超过10秒后停止定位，返回错误信息，默认：5s
+            timeout: 10000, //超过10秒后停止定位，返回错误信息
             buttonPosition: "RB", //定位按钮的停靠位置
             buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
             zoomToAccuracy: true, //定位成功后是否自动调整地图视野到定位点
@@ -146,7 +146,6 @@ export default {
             if (status == "complete") {
               resolve();
               this.location = { ...result.position };
-              this.nowDetail = { ...result };
             } else {
               reject();
               if (result.info == "NOT_SUPPORTED") {
@@ -180,7 +179,6 @@ export default {
           if (status !== "complete") {
             this.$Toast.fail("获取驾车数据失败");
           } else {
-            // this.getMapCenterZoom();
             if (type != this.activeName) {
               this.projectList.push(result.routes[0]);
             }
@@ -254,12 +252,10 @@ export default {
         this.hot_transit.search(...this.getStartEnd, (status, result) => {
           if (status === "complete") {
             this.transitList = [...result.plans];
-            // this.getMapCenterZoom();
           } else if (status === "error") {
             this.$Toast.fail("公交路线数据查询失败");
           } else {
             this.$Toast.fail("暂无路线！");
-            // this.getMapCenterZoom();
           }
         });
       });
@@ -280,7 +276,6 @@ export default {
             this.$Toast.fail("骑行路线数据查询失败");
           } else {
             this.projectList.push(result.routes[0]);
-            // this.getMapCenterZoom();
           }
         });
       });
@@ -309,21 +304,23 @@ export default {
                 duration: 3000
               });
             }
-            // this.getMapCenterZoom();
           }
         });
       });
     },
-    // 获取地图层级与中心点
-    getMapCenterZoom() {
-      this.mapZoom = this.map.getZoom();
-    },
     // 刷新
     refreshMap() {
-      if (!this.mapBounds) {
-        this.mapBounds = this.map.getBounds();
-      }
-      this.map.setBounds(this.mapBounds);
+      let marker1 = this.drawMarker(
+        [this.location.lng, this.location.lat],
+        "start",
+        false
+      );
+      let marker2 = this.drawMarker(
+        [this.cinemaDetail.longitude, this.cinemaDetail.latitude],
+        "end",
+        false
+      );
+      this.map.setFitView([marker1, marker2]);
     },
     // 锁定当前位置
     centerMap() {
@@ -347,7 +344,7 @@ export default {
           mode = "walk";
           break;
       }
-      window.location.href = `https//uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},哈哈哈&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},嘿嘿嘿&mode=${mode}&policy=1&callnative=1`;
+      window.location.href = `https://uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},我的位置&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},${this.cinemaDetail.name}&mode=${mode}&callnative=1`;
     },
     inLoading() {
       this.$Toast.loading({
@@ -375,6 +372,7 @@ export default {
         this.activeName[0].toUpperCase()
       );
       this.drivePolicy = this.activeName;
+      this.isExchangeLocation = true;
       if (this.activeName == "drive") {
         this[`get${type}Path`](projectArr[index], "");
       } else {
@@ -386,25 +384,28 @@ export default {
       this.isShowTransDetail = true;
       this.map.clearMap();
       this.handlePolyline(data.path, "#D3256D", true);
-      let my_marker;
-      my_marker = new AMap.Marker({
-        position: [this.location.lng, this.location.lat],
-        clickable: true,
-        map: this.map,
-        icon: require("../img/start-point.png"),
-        offset: new AMap.Pixel(-20, -45)
-      });
-      my_marker.setTop(true);
-      let my_marker1;
-      my_marker1 = new AMap.Marker({
-        position: [this.cinemaDetail.longitude, this.cinemaDetail.latitude],
-        clickable: true,
-        map: this.map,
-        icon: require("../img/end-point.png"),
-        offset: new AMap.Pixel(-20, -45)
-      });
-      my_marker1.setTop(true);
+      this.drawMarker([this.location.lng, this.location.lat], "start");
+      this.drawMarker(
+        [this.cinemaDetail.longitude, this.cinemaDetail.latitude],
+        "end"
+      );
       this.map.setFitView();
+    },
+    // 构建起点与终点
+    drawMarker(location, type, visible = true) {
+      let point;
+      point = new AMap.Marker({
+        position: location,
+        clickable: true,
+        map: this.map,
+        icon: require(type == "start"
+          ? "../img/start-point.png"
+          : "../img/end-point.png"),
+        offset: new AMap.Pixel(-20, -45),
+        content: visible ? "" : "<div/>"
+      });
+      point.setTop(true);
+      return point;
     }
   },
   // 当进入公交导航详情时，点击返回，阻止返回，回退到公交列表
@@ -415,7 +416,6 @@ export default {
       this.$nextTick(() => {
         this.$refs.topNavigation.activeName = this.activeName;
       });
-
       next(false);
     } else {
       next(true);

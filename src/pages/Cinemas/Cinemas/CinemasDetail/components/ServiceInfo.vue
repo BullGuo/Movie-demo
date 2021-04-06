@@ -23,7 +23,7 @@ export default {
   position: fixed;
   top: 90px;
   left: 0;
-  z-index: 0;
+  z-index: -1;
   background-color: #fff;
   .services {
     padding: 0 30px;
@@ -44,7 +44,7 @@ export default {
       }
       .right {
         margin-left: 5px;
-        line-height: 15px;
+        line-height: 20px;
       }
     }
   }
