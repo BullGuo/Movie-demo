@@ -29,6 +29,17 @@ export default {
       setInterval(() => {
         this.list--;
       }, 1000);
+      // this.$axios({
+      //   url: "sms.tencentcloudapi.com",
+      //   params: {
+      //     PhoneNumberSet: ["+8617341932053"],
+      //     TemplateID: "916608",
+      //     Sign: "一个简单的小站",
+      //     TemplateParamSet: ["383843", "5"],
+      //     SmsSdkAppid: "1400505961"
+      //   }
+      // });
+      this.$axios("http://192.168.50.35:3000/users");
     }
   }
 };
