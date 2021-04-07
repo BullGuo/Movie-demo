@@ -95,5 +95,10 @@ const router = new VueRouter({
   routes,
   mode: "hash"
 });
+router.beforeEach((to, from, next) => {
+  // console.log(to);
+  // console.log(from);
+  next();
+});
 
 export default router;

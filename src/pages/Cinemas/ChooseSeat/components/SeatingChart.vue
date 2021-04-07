@@ -128,13 +128,13 @@ export default {
         if (data.isOccupied && !data.isBroken) {
           return require("../../img/sold-out.png"); // 已售
         } else if (data.sectionId == 637) {
-          return require("../../img/seat-two.png"); // 居中好座位
+          return require("../../img/seat-one.png"); // 居中好座位
         } else if (data.isBroken) {
           return require("../../img/service.png"); // 维修不可选
         } else if (data.isSelected) {
           return require("../../img/selected.png"); // 已选
         } else {
-          return require("../../img/seat-one.png"); // 普通座位
+          return require("../../img/seat-two.png"); // 普通座位
         }
       };
     },

@@ -1,7 +1,7 @@
 <template>
   <ul class="ticket-list" v-if="ticketList.length">
     <li v-for="(item, index) of ticketList" :key="index" class="list-item">
-      <img src="../../img/seat-one.png" alt="" />
+      <img :src="getIcon(index)" alt="" />
       <span>￥{{ item / 100 }}</span>
     </li>
   </ul>
@@ -14,6 +14,15 @@ export default {
     ticketList: {
       type: Array,
       default: () => []
+    }
+  },
+  computed: {
+    getIcon() {
+      return index => {
+        return index
+          ? require("../../img/seat-two.png")
+          : require("../../img/seat-one.png");
+      };
     }
   }
 };

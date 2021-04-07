@@ -1,8 +1,13 @@
 <template>
   <div class="center-view">
     <div class="avatar">
-      <img src="./img/no-user.png" alt="" class="avator-icon" />
-      <div class="nick-name">立即登录</div>
+      <img
+        src="./img/no-user.png"
+        alt=""
+        class="avator-icon"
+        @click="GoToLogin"
+      />
+      <div class="nick-name" @click="GoToLogin">立即登录</div>
     </div>
     <ul class="my-order-tab">
       <li>
@@ -42,8 +47,16 @@
 </template>
 
 <script>
+import LoginUtil from "@/common/utils/LoginUtil";
 export default {
-  name: "indexAction"
+  name: "indexAction",
+  methods: {
+    GoToLogin() {
+      if (LoginUtil.getToken()) {
+        this.$router.push({ name: "login" });
+      }
+    }
+  }
 };
 </script>
 

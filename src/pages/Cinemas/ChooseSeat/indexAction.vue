@@ -132,7 +132,7 @@ export default {
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: normal;
+      white-space: nowrap;
       display: flex;
       justify-content: center;
     }
