@@ -50,6 +50,11 @@
 import LoginUtil from "@/common/utils/LoginUtil";
 export default {
   name: "indexAction",
+  created() {
+    console.log(LoginUtil.getToken());
+    // if (LoginUtil.getToken()) {
+    // }
+  },
   methods: {
     GoToLogin() {
       if (LoginUtil.getToken()) {
