@@ -107,17 +107,24 @@ export default {
               case AccountStatusEnum.CODE_OVERDUE:
               case AccountStatusEnum.ADD_ABSENT:
               case AccountStatusEnum.CODE_ERROR:
-                this.showLoading("fail", res.data.message);
+                await this.showLoading("fail", res.data.message);
                 break;
               case AccountStatusEnum.TOKEN_SUCCESS:
               case AccountStatusEnum.LOGIN_SUCCESS:
                 await this.showLoading("success", res.data.message);
-                LoginUtil.setToken(res.data.token);
+                LoginUtil.setToken(res.data.token, this.afterOfDate(1));
                 this.$router.go(-1);
                 break;
             }
           }
         });
+    },
+    //获取n天后的日期
+    afterOfDate(n) {
+      let d = new Date();
+      let hour = d.getHours();
+      d.setHours(n + hour);
+      return d;
     },
     phoneVerify() {
       let phoneVerify = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;

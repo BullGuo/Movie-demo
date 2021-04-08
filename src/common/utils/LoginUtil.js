@@ -1,13 +1,13 @@
 import CookieUtil from "./CookieUtil";
 export default class LoginUtil {
   static check() {
-    return CookieUtil.get("_ses_token");
+    return CookieUtil.get("movie_token");
   }
-  static setToken(ses_token) {
-    CookieUtil.set("_ses_token", ses_token);
+  static setToken(movie_token, expires) {
+    CookieUtil.set("movie_token", movie_token, expires);
   }
   static getToken() {
-    return CookieUtil.get("_ses_token");
+    return CookieUtil.get("movie_token");
   }
   static setTokenFromUrl() {
     let query = "";
@@ -18,8 +18,8 @@ export default class LoginUtil {
       if (queryArr && queryArr.length) {
         let variable = [];
         queryArr.map(item => {
-          if (item.indexOf("ses_token=") > -1) {
-            let arr = item.split("ses_token=");
+          if (item.indexOf("movie_token=") > -1) {
+            let arr = item.split("movie_token=");
             if (arr && arr.length) {
               query = arr[1];
             }

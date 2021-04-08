@@ -52,12 +52,20 @@ export default {
   name: "indexAction",
   created() {
     console.log(LoginUtil.getToken());
-    // if (LoginUtil.getToken()) {
-    // }
+    if (LoginUtil.getToken()) {
+      let params = { token: LoginUtil.getToken() };
+      this.$axios
+        .post("http://192.168.50.35:3002/myCenter", params)
+        .then(res => {
+          if (res && res.statusText == "OK") {
+            console.log(res);
+          }
+        });
+    }
   },
   methods: {
     GoToLogin() {
-      if (LoginUtil.getToken()) {
+      if (!LoginUtil.getToken()) {
         this.$router.push({ name: "login" });
       }
     }
