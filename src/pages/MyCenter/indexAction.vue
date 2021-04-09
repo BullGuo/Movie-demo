@@ -77,7 +77,8 @@ export default {
   computed: {
     getAvatar() {
       return LoginUtil.getToken()
-        ? require("./img/default_avatar.jpg")
+        ? (this.userInfo && this.userInfo.avatar) ||
+            require("./img/default_avatar.jpg")
         : require("./img/no-user.png");
     }
   }

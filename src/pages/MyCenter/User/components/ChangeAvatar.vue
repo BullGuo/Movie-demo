@@ -52,23 +52,27 @@ export default {
       }
     },
     async updateAfter(file) {
-      file.file = await this.compressImg(file.file);
-      let params = this.formUploadParam(file);
-      params.append("token", LoginUtil.getToken());
-      const { data } = await this.$axios.post(
-        "http://192.168.50.35:3002/upload",
-        params
-      );
-      this.$Toast.loading({ message: "更新中...", forbidClick: true });
-      if (data && data.code == AccountStatusEnum.UPLOAD_SUCCESS) {
-        this.updateFileStatus(file, "done", data);
-        this.avatarImg = data.url;
-        setTimeout(() => {
-          this.$Toast.clear();
-        }, 250);
-      } else {
-        this.updateFileStatus(file, "failed");
-        this.$Toast.fail("图片更换失败，请重试");
+      try {
+        file.file = await this.compressImg(file.file);
+        let params = this.formUploadParam(file);
+        params.append("token", LoginUtil.getToken());
+        const { data } = await this.$axios.post(
+          "http://192.168.50.35:3002/upload",
+          params
+        );
+        this.$Toast.loading({ message: "更新中...", forbidClick: true });
+        if (data && data.code == AccountStatusEnum.UPLOAD_SUCCESS) {
+          this.updateFileStatus(file, "done", data);
+          this.avatarImg = data.url;
+          setTimeout(() => {
+            this.$Toast.clear();
+          }, 250);
+        } else {
+          this.updateFileStatus(file, "failed");
+          this.$Toast.fail("图片更换失败，请重试");
+        }
+      } catch (e) {
+        this.$Toast.fail(e);
       }
     },
     // 图片压缩函数
