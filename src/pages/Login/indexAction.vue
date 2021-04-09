@@ -77,17 +77,12 @@ export default {
         this.countDown--;
         if (this.countDown <= 0) {
           clearInterval(time);
+          this.countDown = 60;
           this.showCode = false;
         }
       }, 1000);
       let params = { account: this.accountNumber };
-      this.$axios
-        .post("http://192.168.50.35:3002/smsCode", params)
-        .then(res => {
-          if (res && res.statusText) {
-            console.log(res);
-          }
-        });
+      this.$axios.post("http://192.168.50.35:3002/smsCode", params);
     },
     // 登录
     handleLogin() {

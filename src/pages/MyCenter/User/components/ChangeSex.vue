@@ -66,7 +66,7 @@ export default {
       this.$Toast.loading({ message: "更新中...", forbidClick: true });
       this.isShow = false;
       this.$axios
-        .post("http://192.168.50.35:3002/update", {
+        .post("http://47.94.152.106:3002/update", {
           sex: value.id,
           token: LoginUtil.getToken()
         })

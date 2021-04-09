@@ -49,12 +49,16 @@ export default {
   name: "indexAction",
   created() {
     if (LoginUtil.getToken()) {
+      this.$Toast.loading({ message: "加载中...", forbidClick: true });
       let params = { token: LoginUtil.getToken() };
       this.$axios
         .post("http://192.168.50.35:3002/myCenter", params)
         .then(res => {
           if (res && res.statusText == "OK") {
             this.userInfo = res.data.accountInfo[0];
+            setTimeout(() => {
+              this.$Toast.clear();
+            }, 300);
           }
         });
     }
