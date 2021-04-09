@@ -1,13 +1,10 @@
 <template>
   <div class="center-view">
     <div class="avatar">
-      <img
-        src="./img/no-user.png"
-        alt=""
-        class="avator-icon"
-        @click="GoToLogin"
-      />
-      <div class="nick-name" @click="GoToLogin">立即登录</div>
+      <img :src="getAvatar" alt="" class="avator-icon" @click="GoToLogin" />
+      <div class="nick-name" @click="GoToLogin">
+        {{ (userInfo && userInfo.name) || "立即登录" }}
+      </div>
     </div>
     <ul class="my-order-tab">
       <li>
@@ -51,23 +48,37 @@ import LoginUtil from "@/common/utils/LoginUtil";
 export default {
   name: "indexAction",
   created() {
-    console.log(LoginUtil.getToken());
     if (LoginUtil.getToken()) {
       let params = { token: LoginUtil.getToken() };
       this.$axios
         .post("http://192.168.50.35:3002/myCenter", params)
         .then(res => {
           if (res && res.statusText == "OK") {
-            console.log(res);
+            this.userInfo = res.data.accountInfo[0];
           }
         });
     }
+  },
+  data() {
+    return {
+      userInfo: null
+    };
   },
   methods: {
     GoToLogin() {
       if (!LoginUtil.getToken()) {
         this.$router.push({ name: "login" });
+      } else {
+        this.$store.commit("setTabs", false);
+        this.$router.push({ name: "user" });
       }
+    }
+  },
+  computed: {
+    getAvatar() {
+      return LoginUtil.getToken()
+        ? require("./img/default_avatar.jpg")
+        : require("./img/no-user.png");
     }
   }
 };

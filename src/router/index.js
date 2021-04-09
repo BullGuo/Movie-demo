@@ -72,6 +72,11 @@ const routes = [
         path: "my_center",
         name: "my_center",
         component: () => import("../pages/MyCenter/indexAction")
+      },
+      {
+        path: "user",
+        name: "user",
+        component: () => import("../pages/MyCenter/User/indexAction")
       }
     ]
   },

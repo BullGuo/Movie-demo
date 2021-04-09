@@ -10,6 +10,8 @@ export class AccountStatusEnum extends Enum {
   static ADD_SUCCESS = "7";
   static ADD_ABSENT = "8";
   static USER_INFO = "9";
+  static UPDATE_SUCCESS = "10";
+  static UPLOAD_SUCCESS = "11";
   initAddDatas() {
     this.add(AccountStatusEnum.CODE_OVERDUE, "验证码过期");
     this.add(AccountStatusEnum.CODE_ERROR, "验证码错误");
@@ -20,5 +22,7 @@ export class AccountStatusEnum extends Enum {
     this.add(AccountStatusEnum.ADD_SUCCESS, "账号添加成功");
     this.add(AccountStatusEnum.ADD_ABSENT, "账号不存在");
     this.add(AccountStatusEnum.USER_INFO, "信息查询成功");
+    this.add(AccountStatusEnum.UPDATE_SUCCESS, "信息更新成功");
+    this.add(AccountStatusEnum.UPLOAD_SUCCESS, "图片上传成功");
   }
 }
