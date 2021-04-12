@@ -3,13 +3,15 @@ import axios from "axios";
 import Vue from "vue";
 import router from "../router";
 import { Toast } from "vant";
+import { AccountStatusEnum } from "@/common/enum/AccountStatusEnum";
+
 Vue.use(Toast);
 
 // 响应拦截器
 axios.interceptors.response.use(
   function(response) {
     const res = response.data;
-    if (res.code && res.code == 3) {
+    if (res.code && res.code == AccountStatusEnum.TOKEN_OVERDUE) {
       Toast.fail({
         message: res.message,
         forbidClick: true

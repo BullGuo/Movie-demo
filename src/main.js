@@ -10,7 +10,6 @@ import "./common/utils/rem";
 import { EventBus } from "../src/common/utils/EventBus";
 import moment from "moment";
 import VueTouch from "vue-touch";
-// var VueTouch = require("vue-touch");
 
 Vue.config.productionTip = false;
 Vue.use(Vant);
