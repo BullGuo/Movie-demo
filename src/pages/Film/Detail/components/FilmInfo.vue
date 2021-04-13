@@ -8,6 +8,7 @@
       <div class="film-grade" v-if="dataDetail.grade">
         <span class="grade">{{ dataDetail.grade }}</span>
         <span class="grade-text">分</span>
+        <van-icon :name="collectName" class="collect" @click="handleCollect" />
       </div>
     </div>
     <div class="grey-text">{{ dataDetail.category | categoryFilter }}</div>
@@ -35,7 +36,8 @@ export default {
   data() {
     return {
       dataDetail: this.$store.state.film_detail,
-      is_up: false
+      is_up: false,
+      collectName: "like-o"
     };
   },
   filters: {
@@ -65,6 +67,14 @@ export default {
         return;
       }
       el.animate({ height: 37 }, 500);
+    },
+    handleCollect() {
+      if (this.collectName == "like-o") {
+        console.log(1111111111);
+      } else {
+        console.log(2222222222);
+      }
+      this.collectName = this.collectName == "like" ? "like-o" : "like";
     }
   }
 };
@@ -108,6 +118,10 @@ export default {
       }
       .grade-text {
         font-size: 10px;
+      }
+      .collect {
+        font-size: 18px;
+        margin-left: 8px;
       }
     }
   }

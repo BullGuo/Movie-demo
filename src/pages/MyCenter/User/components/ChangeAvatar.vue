@@ -72,7 +72,7 @@ export default {
           this.$Toast.fail("图片更换失败，请重试");
         }
       } catch (e) {
-        this.$Toast.fail(e);
+        this.$Toast.fail("网络异常,请重试" + e);
       }
     },
     // 图片压缩函数

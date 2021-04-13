@@ -106,6 +106,7 @@ export default {
                 break;
               case AccountStatusEnum.TOKEN_SUCCESS:
               case AccountStatusEnum.LOGIN_SUCCESS:
+              case AccountStatusEnum.ADD_SUCCESS:
                 await this.showLoading("success", res.data.message);
                 LoginUtil.setToken(res.data.token, this.afterOfDate(1));
                 this.$router.go(-1);
