@@ -7,17 +7,15 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
     <title><%= htmlWebpackPlugin.options.title %></title>
     <script>
-      document.addEventListener("plusready", function() {
+      // const nw = plus.webview.create("http://m.weibo.cn/u/3196963860");
+      document.addEventListener("plusready", () => {
         let webview = plus.webview.currentWebview();
-        plus.key.addEventListener("backbutton", function() {
-          webview.canBack(function(e) {
+        plus.key.addEventListener("backbutton", () => {
+          webview.canBack(e => {
             if (e.canBack) {
               webview.back();
             } else {
-              //webview.close(); //hide,quit
-              //plus.runtime.quit();
-              //首页返回键处理
-              //处理逻辑：1秒内，连续两次按返回键，则退出应用；
+              //返回键处理  1秒内，连续两次按返回键，则退出应用
               let first = null;
               plus.key.addEventListener(
                 "backbutton",
@@ -43,6 +41,14 @@
             }
           });
         });
+        // // 拦截Webview窗口的URL请求
+        // webview.overrideUrlLoading(
+        //   //  拦截所有页面跳转，可使用参数拦截weibo.com域名之外的跳转（{mode:'allow',match:'.*weibo\.com/.*'}）
+        //   { mode: "allow", match: ".*bullguo\.com/.*" },
+        //   function(e) {
+        //     console.log("reject url: " + e.url);
+        //   }
+        // );
       });
     </script>
     <!--    <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>-->

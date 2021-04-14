@@ -69,12 +69,47 @@ export default {
       el.animate({ height: 37 }, 500);
     },
     handleCollect() {
+      let params = {};
       if (this.collectName == "like-o") {
-        console.log(1111111111);
+        // 收藏
+        params = {
+          id: this.dataDetail.filmId,
+          name: this.dataDetail.name,
+          filmType: this.dataDetail.filmType.name,
+          grade: this.dataDetail.grade,
+          actors: this.actorFilter(this.dataDetail.actors),
+          nation: this.dataDetail.nation,
+          runtime: this.dataDetail.runtime,
+          collection_time: Math.floor(new Date().getTime() / 1000),
+          premiereAt: this.dataDetail.premiereAt,
+          type: "collect"
+        };
       } else {
-        console.log(2222222222);
+        // 取消收藏
+        params = {
+          id: this.dataDetail.filmId,
+          type: "cancel_collect"
+        };
       }
+      this.$Toast.loading({ message: "加载中...", forbidClick: true });
+      this.$axios
+        .post("http://192.168.50.35:3002/collect", params)
+        .then(res => {
+          if (res && res.statusText == "OK") {
+            setTimeout(() => {
+              this.$Toast.clear();
+            }, 300);
+          }
+        });
       this.collectName = this.collectName == "like" ? "like-o" : "like";
+    },
+    actorFilter(actor) {
+      if (!actor) return "暂无主演";
+      return actor
+        .map(item => {
+          return item.name;
+        })
+        .join(" ");
     }
   }
 };

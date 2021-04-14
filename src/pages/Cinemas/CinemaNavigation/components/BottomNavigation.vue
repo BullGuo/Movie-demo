@@ -99,13 +99,14 @@ export default {
     },
     handleNavigation() {
       // if (this.activeName == "riding") {
-      //   this.$Toast.fail("骑行暂不支持唤起高德地图");
-      //   return;
+      //   this.actions = [{ name: "高德地图" }];
+      // } else {
+      //   this.actions = [{ name: "高德地图" }, { name: "百度地图" }];
       // }
       this.isShow = true;
     },
-    handleSelect() {
-      this.$emit("arouseTheGold", this.activeName);
+    handleSelect(action, index) {
+      this.$emit("arouseTheGold", this.activeName, index);
     }
   },
   filters: {

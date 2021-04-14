@@ -61,6 +61,7 @@
 
 <script>
 import { asyncLoadScript } from "@/common/utils/utils";
+import ArouseAThirdParty from "@/common/utils/ArouseAThirdParty";
 const mapSrc =
   "https://webapi.amap.com/maps?v=1.4.15&key=31d2705ea862611c04a817de8b96ad85";
 let AMap;
@@ -70,7 +71,7 @@ export default {
     return {
       cinemaDetail: {}, // 目标点信息
       map: null,
-      location: { lng: null, lat: null }, // 当前位置
+      location: { lng: null, lat: null, city: null }, // 当前位置
       geolocation: null, // 当前位置map实例
       activeName: "drive",
       transitList: [], // 公交导航路线方案
@@ -82,7 +83,8 @@ export default {
       drivePolicy: "LEAST_TIME", // 保留上一次选择的路线方案(推荐,方案二)
       isShowTransDetail: false, // 是否显示公交导航详情
       transitDetail: null, // 公交导航详情
-      isExchangeLocation: false
+      isExchangeLocation: false,
+      locationInfo: { start: "我的位置", end: null }
     };
   },
   created() {
@@ -91,6 +93,7 @@ export default {
   methods: {
     init() {
       this.cinemaDetail = this.$route.params.cinemaDetail || {};
+      this.locationInfo.end = this.cinemaDetail.name;
       this.changeWay(this.activeName);
     },
     // 更改导航方式 [驾车,公交,骑行,步行]
@@ -146,6 +149,7 @@ export default {
             if (status == "complete") {
               resolve();
               this.location = { ...result.position };
+              this.location.city = result.addressComponent.city;
             } else {
               reject();
               if (result.info == "NOT_SUPPORTED") {
@@ -328,23 +332,26 @@ export default {
       this.map.setCenter([this.location.lng, this.location.lat]);
     },
     // 唤起高德
-    arouseTheGold(data) {
+    arouseTheGold(data, index) {
       let mode = "";
       switch (data) {
         case "drive":
-          mode = "car";
+          mode = index ? "driving" : "car";
           break;
         case "transit":
-          mode = "bus";
+          mode = index ? "transit" : "bus";
           break;
         case "riding":
           mode = "ride";
           break;
         case "walk":
-          mode = "walk";
+          mode = index ? "walking" : "walk";
           break;
       }
-      window.location.href = `https://uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},我的位置&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},${this.cinemaDetail.name}&mode=${mode}&callnative=1`;
+      let amapUrl = `https://uri.amap.com/navigation?from=${this.location.lng},${this.location.lat},${this.locationInfo.start}&to=${this.cinemaDetail.longitude},${this.cinemaDetail.latitude},${this.locationInfo.end}&mode=${mode}&callnative=1`;
+      // let baiduUrl = `https://api.map.baidu.com/direction?origin=latlng:${this.location.lat},${this.location.lng}|name:${this.locationInfo.start}&destination=latlng:${this.cinemaDetail.latitude},${this.cinemaDetail.longitude}|name:${this.locationInfo.end}&mode=${mode}&region=${this.location.city}&output=html&src=webapp.baidu.movieDemo`;
+      // ArouseAThirdParty(index ? baiduUrl : amapUrl);
+      ArouseAThirdParty(amapUrl);
     },
     inLoading() {
       this.$Toast.loading({
@@ -362,6 +369,11 @@ export default {
       this.location.lat = this.cinemaDetail.latitude;
       this.cinemaDetail.longitude = locationLng;
       this.cinemaDetail.latitude = locationLat;
+      [
+        this.locationInfo.start,
+        this.locationInfo.end,
+        this.cinemaDetail.cityName
+      ] = [this.locationInfo.end, this.locationInfo.start, this.location.city];
       let projectArr = ["LEAST_TIME", "LEAST_DISTANCE"];
       this.projectList = [];
       let index = projectArr.findIndex(item => item == this.drivePolicy);
@@ -379,6 +391,7 @@ export default {
         this[`get${type}Path`]();
       }
     },
+    // 显示公交详情
     showTransDetail(data) {
       this.transitDetail = data;
       this.isShowTransDetail = true;

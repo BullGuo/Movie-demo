@@ -7,6 +7,45 @@ import { AccountStatusEnum } from "@/common/enum/AccountStatusEnum";
 
 Vue.use(Toast);
 
+// 请求拦截器
+axios.interceptors.request.use(
+  function(config) {
+    let devUrl = config.url.indexOf("192.168.50.35:3002");
+    let masterUrl = config.url.indexOf("47.94.152.106:3002");
+    if (devUrl != -1 || masterUrl != -1) {
+      // if (!LoginUtil.getToken()) {
+      //   router.push({ name: "login" });
+      //   throw new axios.Cancel("Operation canceled by the user.");
+      // }
+      console.log(11111111111);
+      let new_data = config.data;
+      if (!(new_data instanceof FormData)) {
+        new_data = new FormData();
+        for (let key in config.data) {
+          if (typeof config.data[key] != "undefined") {
+            new_data.append(
+              key,
+              typeof config.data[key] == "object"
+                ? JSON.stringify(config.data[key])
+                : config.data[key]
+            );
+          }
+        }
+      }
+      new_data.append("token", LoginUtil.getToken());
+      config.data = new_data;
+    }
+    return config;
+  },
+  function(error) {
+    Toast.fail({
+      message: `网络异常，请稍后重试`,
+      duration: 4000
+    });
+    return Promise.reject(error);
+  }
+);
+
 // 响应拦截器
 axios.interceptors.response.use(
   function(response) {
@@ -19,7 +58,7 @@ axios.interceptors.response.use(
       LoginUtil.setToken("");
       router.push({ name: "login" });
     }
-    return res;
+    return response;
   },
   function(error) {
     Toast.fail({
