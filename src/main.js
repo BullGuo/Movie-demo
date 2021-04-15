@@ -11,6 +11,8 @@ import { EventBus } from "../src/common/utils/EventBus";
 import moment from "moment";
 import VueTouch from "vue-touch";
 import "./http";
+import * as api from "./api/index";
+import "./common/components/index";
 
 Vue.config.productionTip = false;
 Vue.use(Vant);
@@ -20,6 +22,9 @@ Vue.prototype.$Toast = Toast;
 Vue.prototype.$axios = axios;
 Vue.prototype.$moment = moment;
 Vue.prototype.$bus = new EventBus();
+Vue.prototype.$api = api;
+
+moment.lang("zh-cn");
 
 new Vue({
   router,

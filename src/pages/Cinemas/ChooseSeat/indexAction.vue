@@ -45,7 +45,6 @@ export default {
     };
   },
   created() {
-    this.$store.commit("setTabs", false);
     this.init({ scheduleId: this.$route.params.schedule });
   },
   methods: {

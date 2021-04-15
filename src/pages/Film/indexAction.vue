@@ -56,6 +56,9 @@ export default {
         this.$store.dispatch("getFilmList");
       }
     }
+  },
+  created() {
+    this.$store.commit("setTabs", true);
   }
 };
 </script>

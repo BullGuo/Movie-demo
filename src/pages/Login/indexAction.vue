@@ -82,7 +82,7 @@ export default {
         }
       }, 1000);
       let params = { account: this.accountNumber };
-      this.$axios.post("http://192.168.50.35:3002/smsCode", params);
+      this.$api.movieSmsCode(params);
     },
     // 登录
     handleLogin() {
@@ -93,27 +93,25 @@ export default {
       this.phoneVerify();
       if (this.accountFormat) return;
       let params = { account: this.accountNumber, code: this.verificationCode };
-      this.$axios
-        .post("http://192.168.50.35:3002/login", params)
-        .then(async res => {
-          if (res && res.statusText == "OK") {
-            switch (res.data.code) {
-              case AccountStatusEnum.TOKEN_OVERDUE:
-              case AccountStatusEnum.CODE_OVERDUE:
-              case AccountStatusEnum.ADD_ABSENT:
-              case AccountStatusEnum.CODE_ERROR:
-                await this.showLoading("fail", res.data.message);
-                break;
-              case AccountStatusEnum.TOKEN_SUCCESS:
-              case AccountStatusEnum.LOGIN_SUCCESS:
-              case AccountStatusEnum.ADD_SUCCESS:
-                await this.showLoading("success", res.data.message);
-                LoginUtil.setToken(res.data.token, this.afterOfDate(1));
-                this.$router.go(-1);
-                break;
-            }
+      this.$api.movieLogin(params).then(async res => {
+        if (res && res.statusText == "OK") {
+          switch (res.data.code) {
+            case AccountStatusEnum.TOKEN_OVERDUE:
+            case AccountStatusEnum.CODE_OVERDUE:
+            case AccountStatusEnum.ADD_ABSENT:
+            case AccountStatusEnum.CODE_ERROR:
+              await this.showLoading("fail", res.data.message);
+              break;
+            case AccountStatusEnum.TOKEN_SUCCESS:
+            case AccountStatusEnum.LOGIN_SUCCESS:
+            case AccountStatusEnum.ADD_SUCCESS:
+              await this.showLoading("success", res.data.message);
+              LoginUtil.setToken(res.data.token, this.afterOfDate(1));
+              this.$router.go(-1);
+              break;
           }
-        });
+        }
+      });
     },
     //获取n天后的日期
     afterOfDate(n) {

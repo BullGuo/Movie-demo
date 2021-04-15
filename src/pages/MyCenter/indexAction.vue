@@ -8,16 +8,14 @@
     </div>
     <ul class="my-order-tab">
       <li>
-        <van-badge :content="5" color="#ff5f16">
-          <img src="./img/film-for-goods-icon.png" alt="" />
-        </van-badge>
+        <!--        <van-badge :content="5" color="#ff5f16">-->
+        <img src="./img/film_orders.png" alt="" />
+        <!--        </van-badge>-->
         <div>电影订单</div>
       </li>
-      <li>
-        <van-badge :content="5" color="#ff5f16">
-          <img src="./img/orders-for-goods-icon.png" alt="" />
-        </van-badge>
-        <div>商品订单</div>
+      <li @click="goToCollect">
+        <img src="./img/collect.png" alt="" />
+        <div>收藏列表</div>
       </li>
     </ul>
     <div class="center-cell">
@@ -48,20 +46,7 @@ import LoginUtil from "@/common/utils/LoginUtil";
 export default {
   name: "indexAction",
   created() {
-    if (LoginUtil.getToken()) {
-      this.$Toast.loading({ message: "加载中...", forbidClick: true });
-      let params = { token: LoginUtil.getToken() };
-      this.$axios
-        .post("http://192.168.50.35:3002/myCenter", params)
-        .then(res => {
-          if (res && res.statusText == "OK") {
-            this.userInfo = res.data.accountInfo[0];
-            setTimeout(() => {
-              this.$Toast.clear();
-            }, 300);
-          }
-        });
-    }
+    this.init();
   },
   data() {
     return {
@@ -69,12 +54,36 @@ export default {
     };
   },
   methods: {
+    init() {
+      this.$store.commit("setTabs", true);
+      if (LoginUtil.getToken()) {
+        this.$Toast.loading({ message: "加载中...", forbidClick: true });
+        this.$api.movieMyCenter({}).then(res => {
+          if (res && res.statusText == "OK") {
+            this.userInfo = res.data.accountInfo[0];
+            setTimeout(() => {
+              this.$Toast.clear();
+            }, 300);
+          }
+        });
+      }
+    },
     GoToLogin() {
+      this.goTo("user");
+    },
+    goToCollect() {
+      this.goTo("collect");
+    },
+    goTo(goto) {
       if (!LoginUtil.getToken()) {
-        this.$router.push({ name: "login" });
+        this.$Toast.loading("加载中");
+        setTimeout(() => {
+          this.$Toast.clear();
+          this.$router.push({ name: "login" });
+        }, 300);
       } else {
         this.$store.commit("setTabs", false);
-        this.$router.push({ name: "user" });
+        this.$router.push({ name: goto });
       }
     }
   },

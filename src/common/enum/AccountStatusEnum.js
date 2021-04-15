@@ -14,6 +14,9 @@ export class AccountStatusEnum extends Enum {
   static UPLOAD_SUCCESS = "11";
   static COLLECT_SUCCESS = "12";
   static CAN_COLLECT_SUCCESS = "13";
+  static HAVE_ALREADY_COLLECTED = "14";
+  static NO_COLLECTED = "15";
+  static BUY_SUCCESS = "16";
   initAddDatas() {
     this.add(AccountStatusEnum.CODE_OVERDUE, "验证码过期");
     this.add(AccountStatusEnum.CODE_ERROR, "验证码错误");
@@ -28,5 +31,8 @@ export class AccountStatusEnum extends Enum {
     this.add(AccountStatusEnum.UPLOAD_SUCCESS, "图片上传成功");
     this.add(AccountStatusEnum.COLLECT_SUCCESS, "收藏成功");
     this.add(AccountStatusEnum.CAN_COLLECT_SUCCESS, "取消收藏成功");
+    this.add(AccountStatusEnum.HAVE_ALREADY_COLLECTED, "已收藏");
+    this.add(AccountStatusEnum.NO_COLLECTED, "未收藏");
+    this.add(AccountStatusEnum.BUY_SUCCESS, "购买成功");
   }
 }

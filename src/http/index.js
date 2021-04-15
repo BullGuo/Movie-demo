@@ -13,11 +13,6 @@ axios.interceptors.request.use(
     let devUrl = config.url.indexOf("192.168.50.35:3002");
     let masterUrl = config.url.indexOf("47.94.152.106:3002");
     if (devUrl != -1 || masterUrl != -1) {
-      // if (!LoginUtil.getToken()) {
-      //   router.push({ name: "login" });
-      //   throw new axios.Cancel("Operation canceled by the user.");
-      // }
-      console.log(11111111111);
       let new_data = config.data;
       if (!(new_data instanceof FormData)) {
         new_data = new FormData();
@@ -50,13 +45,28 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   function(response) {
     const res = response.data;
-    if (res.code && res.code == AccountStatusEnum.TOKEN_OVERDUE) {
+    let { url } = response.config;
+    if (
+      res.code &&
+      res.code == AccountStatusEnum.TOKEN_OVERDUE &&
+      url.indexOf("isCollect") == -1
+    ) {
       Toast.fail({
-        message: res.message,
-        forbidClick: true
+        message: res.message + "请登录",
+        forbidClick: true,
+        duration: 1000
       });
-      LoginUtil.setToken("");
-      router.push({ name: "login" });
+      LoginUtil.setToken("", new Date(0));
+      setTimeout(() => {
+        Toast.loading({
+          message: "加载中",
+          forbidClick: true,
+          duration: 1500
+        });
+      }, 1000);
+      setTimeout(() => {
+        router.push({ name: "login" });
+      }, 2500);
     }
     return response;
   },

@@ -96,14 +96,11 @@ export default {
   },
   methods: {
     handleCancel() {
-      this.$router.push({ name: "cinemas" });
+      this.$router.go(-1);
     }
   },
   components: {
     CinemasListItem: () => import("../components/components/CinemasListItem")
-  },
-  beforeDestroy() {
-    this.$store.commit("setTabs", true);
   }
 };
 </script>

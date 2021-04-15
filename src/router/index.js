@@ -1,4 +1,5 @@
 import Vue from "vue";
+// import store from "../store";
 import VueRouter from "vue-router";
 Vue.use(VueRouter);
 
@@ -32,6 +33,12 @@ const routes = [
         name: "detail",
         props: true,
         component: () => import("../pages/Film/Detail/indexAction")
+      },
+      {
+        path: "film/cinemas/:id",
+        name: "filmCinemas",
+        props: true,
+        component: () => import("../pages/Film/FilmCinemas/indexAction")
       },
       {
         path: "cinemas",
@@ -74,6 +81,11 @@ const routes = [
         component: () => import("../pages/MyCenter/indexAction")
       },
       {
+        path: "my_center/collect",
+        name: "collect",
+        component: () => import("../pages/MyCenter/Collect/indexAction")
+      },
+      {
         path: "user",
         name: "user",
         component: () => import("../pages/MyCenter/User/indexAction")
@@ -100,10 +112,17 @@ const router = new VueRouter({
   routes,
   mode: "hash"
 });
-router.beforeEach((to, from, next) => {
-  // console.log(to);
-  // console.log(from);
-  next();
-});
+
+// router.afterEach(to => {
+// console.log(to);
+// console.log(from);
+// console.log(111111111);
+// switch (to.name) {
+//   case "my_center":
+//     store.commit("setTabs", true);
+//     break;
+// }
+// next(() => {});
+// });
 
 export default router;

@@ -64,7 +64,6 @@ export default {
   methods: {
     init() {
       let arr = [];
-      this.$moment.lang("zh-cn");
       if (!this.detail && !this.detail.showDate && !this.detail.showDate.length)
         return;
       for (let index in this.detail.showDate) {

@@ -25,7 +25,6 @@
 
 <script>
 import { AccountStatusEnum } from "../../../../common/enum/AccountStatusEnum";
-import LoginUtil from "@/common/utils/LoginUtil";
 export default {
   name: "DateOfBirth",
   props: {
@@ -68,21 +67,19 @@ export default {
     handleConfirm(value) {
       this.showPicker = false;
       this.$Toast.loading({ message: "更新中...", forbidClick: true });
-      this.$axios
-        .post("http://192.168.50.35:3002/update", {
-          birthday: Math.floor(this.$moment(value).valueOf() / 1000),
-          token: LoginUtil.getToken()
-        })
-        .then(res => {
-          if (res && res.statusText == "OK") {
-            if (res.data.code == AccountStatusEnum.UPDATE_SUCCESS) {
-              setTimeout(() => {
-                this.itemValue = this.$moment(value).format("YYYY年MM月DD日");
-                this.$Toast.clear();
-              }, 500);
-            }
+      let params = {
+        birthday: Math.floor(this.$moment(value).valueOf() / 1000)
+      };
+      this.$api.movieUpdate(params).then(res => {
+        if (res && res.statusText == "OK") {
+          if (res.data.code == AccountStatusEnum.UPDATE_SUCCESS) {
+            setTimeout(() => {
+              this.itemValue = this.$moment(value).format("YYYY年MM月DD日");
+              this.$Toast.clear();
+            }, 500);
           }
-        });
+        }
+      });
     },
     formatter(type, val) {
       switch (type) {

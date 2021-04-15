@@ -29,8 +29,10 @@ export default {
       detail: {}
     };
   },
-  mounted() {
+  created() {
     this.$store.commit("setTabs", false);
+  },
+  mounted() {
     this.init();
   },
   methods: {
@@ -59,10 +61,6 @@ export default {
     closeClick() {
       this.showClose = false;
     }
-  },
-  beforeRouteLeave(to, from, next) {
-    this.$store.commit("setTabs", to.name == "cinemas" ? true : false);
-    next();
   },
   components: {
     CinemaWrap: () => import("./components/CinemaWrap"),

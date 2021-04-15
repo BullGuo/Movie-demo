@@ -25,7 +25,6 @@
 
 <script>
 import { AccountStatusEnum } from "../../../../common/enum/AccountStatusEnum";
-import LoginUtil from "@/common/utils/LoginUtil";
 export default {
   name: "ChangeSex",
   props: {
@@ -65,22 +64,17 @@ export default {
     onConfirm(value) {
       this.$Toast.loading({ message: "更新中...", forbidClick: true });
       this.isShow = false;
-      this.$axios
-        .post("http://192.168.50.35:3002/update", {
-          sex: value.id,
-          token: LoginUtil.getToken()
-        })
-        .then(res => {
-          if (res && res.statusText == "OK") {
-            if (res.data.code == AccountStatusEnum.UPDATE_SUCCESS) {
-              setTimeout(() => {
-                this.value = value.text;
-                this.default_index = value.id - 1;
-                this.$Toast.clear();
-              }, 500);
-            }
+      this.$api.movieUpdate({ sex: value.id }).then(res => {
+        if (res && res.statusText == "OK") {
+          if (res.data.code == AccountStatusEnum.UPDATE_SUCCESS) {
+            setTimeout(() => {
+              this.value = value.text;
+              this.default_index = value.id - 1;
+              this.$Toast.clear();
+            }, 500);
           }
-        });
+        }
+      });
     }
   }
 };

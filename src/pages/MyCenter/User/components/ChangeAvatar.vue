@@ -17,7 +17,6 @@
 
 <script>
 import { AccountStatusEnum } from "../../../../common/enum/AccountStatusEnum";
-import LoginUtil from "@/common/utils/LoginUtil";
 export default {
   name: "ChangeAvatar",
   props: {
@@ -55,11 +54,7 @@ export default {
       try {
         file.file = await this.compressImg(file.file);
         let params = this.formUploadParam(file);
-        params.append("token", LoginUtil.getToken());
-        const { data } = await this.$axios.post(
-          "http://192.168.50.35:3002/upload",
-          params
-        );
+        const { data } = await this.$api.movieUpload(params);
         this.$Toast.loading({ message: "更新中...", forbidClick: true });
         if (data && data.code == AccountStatusEnum.UPLOAD_SUCCESS) {
           this.updateFileStatus(file, "done", data);
@@ -162,7 +157,6 @@ export default {
 
 <style scoped lang="less">
 .change-avatar {
-  margin-top: 10px;
   .van-image {
     width: 50px;
     height: 50px;

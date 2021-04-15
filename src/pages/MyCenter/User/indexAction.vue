@@ -1,13 +1,7 @@
 <template>
   <div class="user">
     <div v-if="!showChangeName">
-      <van-nav-bar
-        title="我的资料"
-        left-arrow
-        fixed
-        placeholder
-        @click-left="onClickLeft"
-      />
+      <movie-nav-bar nav-bar-title="我的资料" />
       <change-avatar :user-info="userInfo" />
       <div>
         <van-cell
@@ -34,7 +28,6 @@
 </template>
 
 <script>
-import LoginUtil from "@/common/utils/LoginUtil";
 export default {
   name: "indexAction",
   created() {
@@ -50,24 +43,18 @@ export default {
   methods: {
     init() {
       this.$Toast.loading({ message: "加载中...", forbidClick: true });
-      let params = { token: LoginUtil.getToken() };
-      this.$axios
-        .post("http://192.168.50.35:3002/myCenter", params)
-        .then(res => {
-          if (res && res.statusText == "OK") {
-            this.userInfo = res.data.accountInfo[0];
-            setTimeout(() => {
-              this.$Toast.clear();
-            }, 300);
-          }
-        });
+      this.$api.movieMyCenter({}).then(res => {
+        if (res && res.statusText == "OK") {
+          this.userInfo = res.data.accountInfo[0];
+          setTimeout(() => {
+            this.$Toast.clear();
+          }, 300);
+        }
+      });
     },
     updateName() {
       this.showChangeName = false;
       this.init();
-    },
-    onClickLeft() {
-      this.$router.go(-1);
     },
     goBack() {
       this.showChangeName = false;
@@ -78,9 +65,6 @@ export default {
     ChangeName: () => import("./components/ChangeName"),
     ChangeSex: () => import("./components/ChangeSex"),
     DateOfBirth: () => import("./components/DateOfBirth")
-  },
-  destroyed() {
-    this.$store.commit("setTabs", true);
   }
 };
 </script>
@@ -88,16 +72,5 @@ export default {
 <style scoped lang="less">
 .user {
   background-color: #f4f4f4;
-}
-/deep/ .van-nav-bar .van-icon {
-  color: #404345;
-  font-size: 22px;
-}
-/deep/ .van-nav-bar__title {
-  font-size: 17px;
-}
-/deep/ .van-nav-bar__text {
-  color: #404345;
-  font-size: 16px;
 }
 </style>

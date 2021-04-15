@@ -5,9 +5,15 @@
 <script>
 export default {
   name: "BuyTicket",
+  props: {
+    id: {
+      type: [Number, String],
+      default: ""
+    }
+  },
   methods: {
     buyTicketClick() {
-      console.log("我要买票!");
+      this.$router.push({ name: "filmCinemas", params: { id: this.id } });
     }
   }
 };

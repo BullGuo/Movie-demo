@@ -10,6 +10,7 @@
       <actor-list />
       <stage-photo :show-stage-photo.sync="showStagePhoto" ref="stagePhoto" />
       <buy-ticket
+        :id="id"
         v-if="
           $store.state.film_detail.isPresale || $store.state.film_detail.isSale
         "
@@ -45,7 +46,6 @@ export default {
     }
   },
   mounted() {
-    this.$store.commit("setTabs", false);
     if (!this.$store.state.film_detail.isSale) {
       this.$store.commit("setTabs", false);
       this.$dialog
@@ -58,9 +58,6 @@ export default {
           this.$router.replace({ name: "film" });
         });
     }
-  },
-  beforeDestroy() {
-    this.$store.commit("setTabs", true);
   },
   // 当打开剧照详情时，物理返回不应回到电影列表
   beforeRouteLeave(to, from, next) {

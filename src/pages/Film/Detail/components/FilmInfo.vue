@@ -5,9 +5,11 @@
         <span class="name">{{ dataDetail.name }}</span>
         <span class="item">{{ dataDetail.filmType.name }}</span>
       </div>
-      <div class="film-grade" v-if="dataDetail.grade">
-        <span class="grade">{{ dataDetail.grade }}</span>
-        <span class="grade-text">分</span>
+      <div class="film-grade">
+        <span v-if="dataDetail.grade">
+          <span class="grade">{{ dataDetail.grade }}</span>
+          <span class="grade-text">分</span>
+        </span>
         <van-icon :name="collectName" class="collect" @click="handleCollect" />
       </div>
     </div>
@@ -31,6 +33,7 @@
 
 <script>
 import $ from "jquery";
+import { AccountStatusEnum } from "../../../../common/enum/AccountStatusEnum";
 export default {
   name: "FilmInfo",
   data() {
@@ -39,6 +42,9 @@ export default {
       is_up: false,
       collectName: "like-o"
     };
+  },
+  mounted() {
+    this.init();
   },
   filters: {
     categoryFilter(val) {
@@ -57,6 +63,17 @@ export default {
     }
   },
   methods: {
+    init() {
+      this.$api.movieIsCollect({ id: this.dataDetail.filmId }).then(res => {
+        if (res && res.statusText == "OK") {
+          if (res.data.code == AccountStatusEnum.HAVE_ALREADY_COLLECTED) {
+            this.collectName = "like";
+          } else {
+            this.collectName = "like-o";
+          }
+        }
+      });
+    },
     iconClick() {
       let el = $(".film-detail .hide");
       this.is_up = !this.is_up;
@@ -68,7 +85,7 @@ export default {
       }
       el.animate({ height: 37 }, 500);
     },
-    handleCollect() {
+    async handleCollect() {
       let params = {};
       if (this.collectName == "like-o") {
         // 收藏
@@ -76,12 +93,15 @@ export default {
           id: this.dataDetail.filmId,
           name: this.dataDetail.name,
           filmType: this.dataDetail.filmType.name,
-          grade: this.dataDetail.grade,
+          grade: this.dataDetail.grade || null,
           actors: this.actorFilter(this.dataDetail.actors),
           nation: this.dataDetail.nation,
           runtime: this.dataDetail.runtime,
           collection_time: Math.floor(new Date().getTime() / 1000),
           premiereAt: this.dataDetail.premiereAt,
+          isPresale: this.dataDetail.isPresale ? 1 : 0,
+          isSale: this.dataDetail.isSale ? 1 : 0,
+          poster: this.dataDetail.poster,
           type: "collect"
         };
       } else {
@@ -92,16 +112,20 @@ export default {
         };
       }
       this.$Toast.loading({ message: "加载中...", forbidClick: true });
-      this.$axios
-        .post("http://192.168.50.35:3002/collect", params)
-        .then(res => {
-          if (res && res.statusText == "OK") {
-            setTimeout(() => {
-              this.$Toast.clear();
-            }, 300);
+      await this.$api.movieCollect(params).then(res => {
+        if (res && res.statusText == "OK") {
+          switch (res.data.code) {
+            case AccountStatusEnum.COLLECT_SUCCESS:
+            case AccountStatusEnum.CAN_COLLECT_SUCCESS:
+              this.$Toast.success(res.data.message);
+              setTimeout(() => {
+                this.$Toast.clear();
+              }, 2000);
+              this.collectName = this.collectName == "like" ? "like-o" : "like";
+              break;
           }
-        });
-      this.collectName = this.collectName == "like" ? "like-o" : "like";
+        }
+      });
     },
     actorFilter(actor) {
       if (!actor) return "暂无主演";

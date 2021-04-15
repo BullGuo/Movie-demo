@@ -4,7 +4,10 @@
 
 <script>
 export default {
-  name: "indexAction"
+  name: "indexAction",
+  created() {
+    this.$store.commit("setTabs", true);
+  }
 };
 </script>
 

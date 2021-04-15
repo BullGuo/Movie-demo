@@ -21,7 +21,6 @@
 
 <script>
 import { AccountStatusEnum } from "../../../../common/enum/AccountStatusEnum";
-import LoginUtil from "@/common/utils/LoginUtil";
 export default {
   name: "ChangeName",
   props: {
@@ -38,21 +37,16 @@ export default {
   methods: {
     onClickRight() {
       this.$Toast.loading({ message: "更新中...", forbidClick: true });
-      this.$axios
-        .post("http://192.168.50.35:3002/update", {
-          name: this.nickname,
-          token: LoginUtil.getToken()
-        })
-        .then(res => {
-          if (res && res.statusText == "OK") {
-            if (res.data.code == AccountStatusEnum.UPDATE_SUCCESS) {
-              setTimeout(() => {
-                this.$Toast.clear();
-                this.$emit("changeNameSuccess");
-              }, 500);
-            }
+      this.$api.movieUpdate({ name: this.nickname }).then(res => {
+        if (res && res.statusText == "OK") {
+          if (res.data.code == AccountStatusEnum.UPDATE_SUCCESS) {
+            setTimeout(() => {
+              this.$Toast.clear();
+              this.$emit("changeNameSuccess");
+            }, 500);
           }
-        });
+        }
+      });
     }
   }
 };
