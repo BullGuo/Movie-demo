@@ -41,14 +41,26 @@ export default {
     return {
       infoDetail: {},
       seatingChart: {},
-      selectedSeatList: []
+      selectedSeatList: [],
+      cinemaId: "",
+      activeIndex: "",
+      filmId: ""
     };
   },
   created() {
     this.init({ scheduleId: this.$route.params.schedule });
+    this.cinemaId = this.$route.params.cinemaId || "";
+    this.activeIndex = this.$route.query.activeIndex || "";
+    this.filmId = this.$route.query.filmId || "";
   },
   methods: {
     init(value) {
+      this.$Toast.loading({
+        forbidClick: true,
+        duration: 0,
+        loadingType: "spinner",
+        className: "toast"
+      });
       let params = { ...value, k: "9864735" };
       // 影厅信息详情
       this.$axios({
@@ -76,18 +88,12 @@ export default {
       }).then(res => {
         if (res && res.data.msg == "表示成功") {
           this.seatingChart = { ...res.data.data.seatingChart };
+          this.$Toast.clear();
         }
       });
     },
     async changeTiming(data) {
-      this.$Toast.loading({
-        forbidClick: true,
-        duration: 0,
-        loadingType: "spinner",
-        className: "toast"
-      });
       await this.init(data);
-      this.$Toast.clear();
       this.$refs.seatingChart.changeTime();
     },
     getSeatList(list) {
@@ -98,6 +104,13 @@ export default {
     },
     goBack() {
       history.go(-1);
+      setTimeout(() => {
+        this.$router.replace({
+          name: "cinemas_detail",
+          params: { cinemaId: this.cinemaId },
+          query: { filmId: this.filmId, activeIndex: this.activeIndex }
+        });
+      }, 500);
     }
   },
   components: {

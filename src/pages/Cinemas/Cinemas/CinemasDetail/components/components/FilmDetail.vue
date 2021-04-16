@@ -52,6 +52,7 @@ export default {
   padding: 15px 0;
   text-align: center;
   position: relative;
+  background-color: #fff;
   .film-head {
     margin-bottom: 10px;
     line-height: 18px;

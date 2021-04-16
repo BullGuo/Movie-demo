@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div :class="fixTab ? 'fix-tab' : ''">
+    <div v-if="fixTab" class="placeholder-fix" />
     <van-tabs
       v-model="active"
       swipeable
@@ -18,6 +19,8 @@
       >
         <schedule-list
           :schedules-list="schedulesList"
+          :active-index="detail.showDate[active]"
+          :film-id="id.filmId"
           v-if="schedulesList.length"
         />
         <van-empty v-else description="暂无数据" :image="emptyImg" />
@@ -37,28 +40,55 @@ export default {
     }
   },
   watch: {
+    detail: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        if (this.$route.query.activeIndex) {
+          this.active = val.showDate.findIndex(
+            item => item == +this.$route.query.activeIndex
+          );
+        } else {
+          console.log(1111111111111);
+          this.active = 0;
+        }
+        console.log(this.active);
+      }
+    },
     id: {
       immediate: true,
       async handler(val) {
-        this.active = 0;
+        // console.log(this.$route.query.activeIndex);
+        if (val.filmId == "") return;
+        console.log(this.active);
         await this.init();
         if (!val.cinemaId || !val.filmId) return;
         this.getScheduleList();
       }
     },
+    // active: "getScheduleList"
     active: {
       handler(val) {
-        if (!val) return;
+        console.log(val);
         this.getScheduleList();
       }
     }
+  },
+  created() {
+    this.$bus.$on("fixTab", data => {
+      this.fixTab = data;
+    });
+  },
+  beforeDestroy() {
+    this.$bus.$off("fixTab");
   },
   data() {
     return {
       tabList: [],
       active: 0,
       schedulesList: [],
-      emptyImg: require("@/common/assets/img/empty.png")
+      emptyImg: require("@/common/assets/img/empty.png"),
+      fixTab: false
     };
   },
   methods: {
@@ -66,18 +96,19 @@ export default {
       let arr = [];
       if (!this.detail && !this.detail.showDate && !this.detail.showDate.length)
         return;
-      for (let index in this.detail.showDate) {
-        let day = this.$moment(this.detail.showDate[index] * 1000).format(
-          "M月D日"
-        );
+      let list = [...this.detail.showDate].sort((value1, value2) => {
+        return value1 - value2;
+      });
+      for (let index in list) {
+        let day = this.$moment(list[index] * 1000).format("M月D日");
         if (index <= 1) {
           arr.push(
-            this.$moment(this.detail.showDate[index] * 1000)
+            this.$moment(list[index] * 1000)
               .calendar()
               .substring(0, 2) + day
           );
         } else {
-          arr.push(this.getWeek(this.detail.showDate[index]) + day);
+          arr.push(this.getWeek(list[index]) + day);
         }
       }
       this.tabList = [...arr];
@@ -151,5 +182,17 @@ export default {
 /deep/ .van-tabs__line {
   width: 80px;
   height: 2px;
+}
+.fix-tab {
+  /deep/ .van-tabs--line .van-tabs__wrap {
+    position: fixed;
+    top: 120px;
+    width: 100%;
+    z-index: 303;
+  }
+}
+.placeholder-fix {
+  width: 100%;
+  height: 44px;
 }
 </style>

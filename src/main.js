@@ -24,7 +24,7 @@ Vue.prototype.$moment = moment;
 Vue.prototype.$bus = new EventBus();
 Vue.prototype.$api = api;
 
-moment.lang("zh-cn");
+moment.locale("zh-cn");
 
 new Vue({
   router,

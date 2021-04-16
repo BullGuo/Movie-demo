@@ -47,6 +47,7 @@ const routes = [
           {
             path: "",
             name: "cinemas",
+            // meta: { keepAlive: true },
             component: () => import("../pages/Cinemas/Cinemas/indexAction")
           }
         ]

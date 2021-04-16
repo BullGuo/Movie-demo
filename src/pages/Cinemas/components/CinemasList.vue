@@ -28,6 +28,11 @@ export default {
       deep: true,
       immediate: true,
       handler() {
+        if (
+          !this.$store.state.cityInfo.cityId ||
+          !this.$store.state.cityInfo.cityID
+        )
+          return;
         this.init();
       }
     }
@@ -72,7 +77,8 @@ export default {
 <style scoped lang="less">
 .cinemas-list {
   width: 100%;
-  height: calc(100vh - 142px);
+  height: 100%;
   padding-top: 92px;
+  overflow: auto;
 }
 </style>

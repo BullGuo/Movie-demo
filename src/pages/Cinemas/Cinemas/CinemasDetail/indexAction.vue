@@ -1,12 +1,14 @@
 <template>
-  <div class="cinema-schedule">
+  <div class="cinema-schedule" @scroll="headerScroll">
     <div class="header-left">
       <van-icon v-if="!showClose" name="arrow-left" @click="goBack" />
       <van-icon v-else name="cross" @click="closeClick" />
     </div>
-    <div class="header-title">
-      {{ detail.name }}
-    </div>
+    <van-sticky>
+      <div class="header-title">
+        {{ detail.name }}
+      </div>
+    </van-sticky>
     <div v-show="!showClose">
       <cinema-wrap :show-close.sync="showClose" :detail="detail" />
       <film-list :cinema-id="cinemaId" />
@@ -36,6 +38,9 @@ export default {
     this.init();
   },
   methods: {
+    headerScroll(e) {
+      this.$bus.$emit("fixTab", e.target.scrollTop >= 300 ? true : false);
+    },
     init() {
       let params = { cinemaId: this.cinemaId, k: 3239016 };
       // 影院信息
@@ -79,14 +84,15 @@ export default {
 }
 .cinema-schedule {
   padding-top: 44px;
+  overflow: auto;
   .header-left {
     padding: 10px 0 0 8px;
     position: fixed;
     top: 0;
     font-size: 24px;
     color: rgb(129, 129, 129);
-    width: 100%;
     background-color: #fff;
+    z-index: 300;
   }
   .header-title {
     font-size: 17px;
@@ -97,8 +103,8 @@ export default {
     overflow: hidden;
     width: 100%;
     padding: 0 15px;
-    height: 44px;
-    line-height: 44px;
+    height: 46px;
+    line-height: 46px;
     background-color: #fff;
   }
   .fix-header-title {

@@ -108,15 +108,6 @@ export default {
     };
   },
   created() {
-    this.$Toast.loading({
-      forbidClick: true,
-      duration: 0,
-      loadingType: "spinner",
-      className: "toast"
-    });
-    this.$nextTick(() => {
-      this.$Toast.clear();
-    });
     this.$bus.$on("deleteSeat", this.deleteSeat);
   },
   beforeDestroy() {

@@ -71,9 +71,6 @@ export default {
       cityName: this.$store.state.cityInfo.name
     };
   },
-  created() {
-    this.$store.commit("setCinemasParams", { ticketFlag: 1 });
-  },
   methods: {
     handleOpen() {
       if (this.list.length == 1) {

@@ -46,7 +46,9 @@ export default {
     schedulesList: {
       type: Array,
       default: () => []
-    }
+    },
+    activeIndex: [String, Number],
+    filmId: [String, Number]
   },
   methods: {
     chooseSeat(data) {
@@ -63,6 +65,11 @@ export default {
           schedule: data.scheduleId,
           ticketList: [data.maxSalePrice, data.minSalePrice],
           schedulesList: this.schedulesList
+        },
+        query: {
+          cinemaId: this.$route.params.cinemaId,
+          activeIndex: this.activeIndex,
+          filmId: this.filmId
         }
       });
     }

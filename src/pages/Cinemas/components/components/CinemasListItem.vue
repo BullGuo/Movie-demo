@@ -36,14 +36,22 @@
 export default {
   name: "CinemasListItem",
   props: {
-    detail: Object
+    detail: Object,
+    filmId: [String, Number],
+    activeIndex: [String, Number]
   },
   methods: {
     goCinemasDetail() {
       this.$store.commit("setTabs", false);
       this.$router.push({
         name: "cinemas_detail",
-        params: { cinemaId: this.detail.cinemaId }
+        params: {
+          cinemaId: this.detail.cinemaId
+        },
+        query: {
+          filmId: this.filmId,
+          activeIndex: this.activeIndex
+        }
       });
     }
   }

@@ -18,7 +18,11 @@
     <div class="cinema-nearby" v-if="!showClear">
       <div class="cinema-index-title">离你最近</div>
       <ul class="cinema-index-detail">
-        <li v-for="item in list.slice(0, 5)" :key="item.cinemaId">
+        <li
+          v-for="item in list.slice(0, 5)"
+          :key="item.cinemaId"
+          @click="goToDetail(item)"
+        >
           {{ item.name }}
         </li>
       </ul>
@@ -97,6 +101,13 @@ export default {
   methods: {
     handleCancel() {
       this.$router.go(-1);
+    },
+    goToDetail(data) {
+      this.$store.commit("setTabs", false);
+      this.$router.push({
+        name: "cinemas_detail",
+        params: { cinemaId: data.cinemaId }
+      });
     }
   },
   components: {

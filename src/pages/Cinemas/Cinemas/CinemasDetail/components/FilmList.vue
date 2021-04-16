@@ -22,7 +22,9 @@
       <div class="triangle">
         <img src="../img/triangle.png" alt="" />
       </div>
-      <film-detail :detail="list[activeIndex] ? list[activeIndex] : {}" />
+      <van-sticky :offset-top="46">
+        <film-detail :detail="list[activeIndex] ? list[activeIndex] : {}" />
+      </van-sticky>
       <date-list
         :id="{
           cinemaId: cinemaId,
@@ -53,6 +55,7 @@ export default {
     };
   },
   created() {
+    console.log(this.$route.query.filmId);
     this.init();
   },
   methods: {
@@ -70,6 +73,12 @@ export default {
       }).then(res => {
         if (res && res.data.msg == "ok") {
           this.list = [...res.data.data.films];
+          let index = 0;
+          if (this.$route.query.filmId) {
+            index = this.list.findIndex(
+              item => item.filmId == this.$route.query.filmId
+            );
+          }
           this.$nextTick(() => {
             /* eslint-disable no-new */
             new Swiper(".swiper-container", {
@@ -77,6 +86,7 @@ export default {
               spaceBetween: 12,
               slideToClickedSlide: true, // 点击可切换
               centeredSlides: true,
+              initialSlide: index,
               on: {
                 slideChange: e => {
                   this.activeIndex = e.activeIndex;

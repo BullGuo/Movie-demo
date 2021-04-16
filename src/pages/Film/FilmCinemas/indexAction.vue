@@ -13,7 +13,7 @@
         <img src="../../Cinemas/img/search.png" alt="" class="header-right" />
       </template>
     </van-nav-bar>
-    <top-tabs :cinemas-list="cinemasList" />
+    <top-tabs :cinemas-list="cinemasList" :id="id" />
   </div>
 </template>
 
@@ -49,7 +49,6 @@ export default {
       }).then(res => {
         if (res && res.statusText == "OK") {
           this.filmDetail = { ...res.data.data.film };
-          console.log(this.filmDetail);
         }
       });
       let cityInfo = this.$store.state.cityInfo;
@@ -69,22 +68,8 @@ export default {
       }).then(res => {
         if (res && res.statusText == "OK") {
           this.cinemasList = [...res.data.data.showCinemas];
-          console.log(this.cinemasList);
         }
       });
-      // 所有影院列表
-      // this.$axios({
-      //   url: "https://m.maizuo.com/gateway",
-      //   method: "post",
-      //   params: { k: 8084840 },
-      //   headers: {
-      //     "X-Client-Info":
-      //       '{"a":"3000","ch":"1002","v":"5.0.4","e":"16092348011945091904110593"}',
-      //     "X-Host": "mall.film-ticket.cinema.batch-cinema"
-      //   }
-      // }).then(res => {
-      //   console.log(res);
-      // });
     },
     onClickLeft() {
       this.$router.go(-1);
