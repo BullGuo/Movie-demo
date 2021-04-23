@@ -14,29 +14,33 @@
           :key="data.id"
           @click="handleClick(data.id)"
         >
-          <img :src="data.poster" />
-          <div class="nowPlayingFilm-info">
-            <div class="film-name">
-              <span class="name">{{ data.name }}</span>
-              <span class="item">{{ data.filmType }}</span>
+          <slot>
+            <!--            <div>-->
+            <img :src="data.poster" />
+            <div class="nowPlayingFilm-info">
+              <div class="film-name">
+                <span class="name">{{ data.name }}</span>
+                <span class="item">{{ data.filmType }}</span>
+              </div>
+              <div class="film-grade" v-if="data.grade">
+                <span class="info-col">观众评分 </span>
+                <span class="grade">{{ data.grade }}</span>
+              </div>
+              <div class="van-ellipsis info-col">主演：{{ data.actors }}</div>
+              <div class="info-col">
+                {{ data.nation }} | {{ data.runtime }}分钟
+              </div>
             </div>
-            <div class="film-grade" v-if="data.grade">
-              <span class="info-col">观众评分 </span>
-              <span class="grade">{{ data.grade }}</span>
-            </div>
-            <div class="van-ellipsis info-col">主演：{{ data.actors }}</div>
-            <div class="info-col">
-              {{ data.nation }} | {{ data.runtime }}分钟
-            </div>
-          </div>
-          <van-button
-            plain
-            :color="data.isSale ? '#ffb232' : '#ff5f16'"
-            size="small"
-            v-if="data.isPresale || data.isSale"
-          >
-            {{ data.isSale ? "预购" : "购票" }}
-          </van-button>
+            <van-button
+              plain
+              :color="data.isSale ? '#ffb232' : '#ff5f16'"
+              size="small"
+              v-if="data.isPresale || data.isSale"
+            >
+              {{ data.isSale ? "预购" : "购票" }}
+            </van-button>
+            <!--            </div>-->
+          </slot>
         </li>
       </van-list>
     </ul>

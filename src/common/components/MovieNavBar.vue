@@ -5,7 +5,7 @@
     fixed
     placeholder
     @click-left="onClickLeft"
-    class="nav-bar"
+    :class="hasMargin ? 'nav-bar' : ''"
   />
 </template>
 
@@ -16,6 +16,10 @@ export default {
     navBarTitle: {
       type: String,
       default: ""
+    },
+    hasMargin: {
+      type: Boolean,
+      default: true
     }
   },
   methods: {

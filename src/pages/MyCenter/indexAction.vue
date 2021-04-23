@@ -7,7 +7,7 @@
       </div>
     </div>
     <ul class="my-order-tab">
-      <li>
+      <li @click="goToFilmOrders">
         <!--        <van-badge :content="5" color="#ff5f16">-->
         <img src="./img/film_orders.png" alt="" />
         <!--        </van-badge>-->
@@ -70,6 +70,9 @@ export default {
     },
     GoToLogin() {
       this.goTo("user");
+    },
+    goToFilmOrders() {
+      this.goTo("film_orders");
     },
     goToCollect() {
       this.goTo("collect");

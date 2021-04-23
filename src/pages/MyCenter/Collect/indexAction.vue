@@ -8,9 +8,6 @@
 <script>
 export default {
   name: "indexAction",
-  created() {
-    this.$store.commit("setTabs", false);
-  },
   components: {
     movieList: () => import("../components/movieList")
   }

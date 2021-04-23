@@ -83,6 +83,11 @@ const routes = [
       },
       {
         path: "my_center/collect",
+        name: "film_orders",
+        component: () => import("../pages/MyCenter/FilmOrders/indexAction")
+      },
+      {
+        path: "my_center/collect",
         name: "collect",
         component: () => import("../pages/MyCenter/Collect/indexAction")
       },
