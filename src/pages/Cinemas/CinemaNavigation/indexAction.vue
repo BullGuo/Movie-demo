@@ -459,14 +459,14 @@ export default {
   > img {
     position: absolute;
     right: 12px;
-    z-index: 99999;
+    z-index: 100;
   }
   .refresh-icon {
     right: 20px;
     bottom: 222px;
     width: 30px;
     height: 30px;
-    z-index: 9999;
+    z-index: 100;
   }
   .center-icon {
     bottom: 166px;
