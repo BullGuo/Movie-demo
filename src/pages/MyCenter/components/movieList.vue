@@ -14,8 +14,7 @@
           :key="data.id"
           @click="handleClick(data.id)"
         >
-          <slot>
-            <!--            <div>-->
+          <slot v-bind:data="data">
             <img :src="data.poster" />
             <div class="nowPlayingFilm-info">
               <div class="film-name">
@@ -39,7 +38,6 @@
             >
               {{ data.isSale ? "预购" : "购票" }}
             </van-button>
-            <!--            </div>-->
           </slot>
         </li>
       </van-list>

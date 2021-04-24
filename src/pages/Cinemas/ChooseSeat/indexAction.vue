@@ -19,6 +19,12 @@
       ref="seatingChart"
       @getSeatList="getSeatList"
     />
+    <div class="seat-list">
+      <div><img src="../img/service.png" alt="" /><span>不可选</span></div>
+      <div><img src="../img/sold-out.png" alt="" /><span>已售</span></div>
+      <div><img src="../img/seat-two.png" alt="" /> <span>可选</span></div>
+      <div><img src="../img/selected.png" alt="" /> <span>选中</span></div>
+    </div>
     <action-card
       :card-detail="infoDetail"
       :selected-seat-list="selectedSeatList"
@@ -100,7 +106,15 @@ export default {
       this.selectedSeatList = [...list];
     },
     buyTicketClick() {
-      console.log(1111111);
+      this.$Toast.loading({ message: "购买中...", forbidClick: true });
+      this.$api.movieBuyTicket({}).then(res => {
+        if (res && res.statusText == "OK") {
+          // this.userInfo = res.data.accountInfo[0];
+          setTimeout(() => {
+            this.$Toast.clear();
+          }, 300);
+        }
+      });
     },
     goBack() {
       history.go(-1);
@@ -169,6 +183,30 @@ export default {
     cursor: pointer;
     &:active {
       background: rgb(229, 85, 19);
+    }
+  }
+  .seat-list {
+    position: fixed;
+    bottom: 135px;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    display: flex;
+    align-content: center;
+    justify-content: space-around;
+    padding: 0 45px;
+    div {
+      display: flex;
+      align-content: center;
+    }
+    img {
+      width: 20px;
+      height: 20px;
+    }
+    span {
+      font-size: 13px;
+      color: #797d82;
+      margin-left: 5px;
     }
   }
 }

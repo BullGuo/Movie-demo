@@ -8,9 +8,9 @@
     </div>
     <ul class="my-order-tab">
       <li @click="goToFilmOrders">
-        <!--        <van-badge :content="5" color="#ff5f16">-->
-        <img src="./img/film_orders.png" alt="" />
-        <!--        </van-badge>-->
+        <van-badge :content="5" color="#ff5f16">
+          <img src="./img/film_orders.png" alt="" />
+        </van-badge>
         <div>电影订单</div>
       </li>
       <li @click="goToCollect">

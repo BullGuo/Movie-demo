@@ -138,7 +138,7 @@ export default {
     .swiper-slide {
       background-color: hsla(0, 0%, 95.7%, 0.6);
       width: 70px !important;
-      height: 60px;
+      height: 64px;
       padding: 6px 0;
       text-align: center;
       border-radius: 2px;
