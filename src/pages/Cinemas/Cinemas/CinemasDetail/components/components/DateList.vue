@@ -21,6 +21,7 @@
           :schedules-list="schedulesList"
           :active-index="detail.showDate[active]"
           :film-id="id.filmId"
+          :detail="detail"
           v-if="schedulesList.length"
         />
         <van-empty v-else description="暂无数据" :image="emptyImg" />
@@ -44,12 +45,12 @@ export default {
       deep: true,
       immediate: true,
       handler(val) {
+        console.log(val.showDate);
         if (this.$route.query.activeIndex) {
           this.active = val.showDate.findIndex(
             item => item == +this.$route.query.activeIndex
           );
         } else {
-          console.log(1111111111111);
           this.active = 0;
         }
         console.log(this.active);

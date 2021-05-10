@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import { AccountStatusEnum } from "../../../common/enum/AccountStatusEnum";
 export default {
   name: "indexAction",
   data() {
@@ -50,7 +51,8 @@ export default {
       selectedSeatList: [],
       cinemaId: "",
       activeIndex: "",
-      filmId: ""
+      filmId: "",
+      detail: {}
     };
   },
   created() {
@@ -58,6 +60,7 @@ export default {
     this.cinemaId = this.$route.params.cinemaId || "";
     this.activeIndex = this.$route.query.activeIndex || "";
     this.filmId = this.$route.query.filmId || "";
+    this.detail = this.$route.params.detail || {};
   },
   methods: {
     init(value) {
@@ -107,14 +110,41 @@ export default {
     },
     buyTicketClick() {
       this.$Toast.loading({ message: "购买中...", forbidClick: true });
-      this.$api.movieBuyTicket({}).then(res => {
+      let params = {
+        id: this.filmId,
+        name: this.detail.name,
+        filmType: this.detail.filmType.name,
+        grade: this.detail.grade,
+        actors: this.actorFilter(this.detail.actors),
+        nation: this.detail.nation,
+        runtime: this.detail.runtime,
+        poster: this.detail.poster,
+        buyTime: Math.floor(new Date().getTime() / 1000),
+        premiereAt: this.detail.premiereAt,
+        seatNumber: this.getSeat(),
+        cinemaName: this.infoDetail.cinema.name,
+        movieHall: this.infoDetail.hall.name,
+        showAt: this.infoDetail.showAt
+      };
+      this.$api.movieBuyTicket(params).then(res => {
         if (res && res.statusText == "OK") {
-          // this.userInfo = res.data.accountInfo[0];
-          setTimeout(() => {
-            this.$Toast.clear();
-          }, 300);
+          if (res.data.code == AccountStatusEnum.TOKEN_OVERDUE) return;
+          this.$Toast.success({ message: "购买成功", forbidClick: true });
         }
       });
+    },
+    actorFilter(actor) {
+      if (!actor) return "暂无主演";
+      return actor
+        .map(item => {
+          return item.name;
+        })
+        .join(" ");
+    },
+    getSeat() {
+      return this.selectedSeatList
+        .map(item => `${item.rowNum}排${item.columnNum}座`)
+        .join("，");
     },
     goBack() {
       history.go(-1);

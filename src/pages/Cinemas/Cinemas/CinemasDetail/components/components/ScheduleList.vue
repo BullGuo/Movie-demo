@@ -48,7 +48,11 @@ export default {
       default: () => []
     },
     activeIndex: [String, Number],
-    filmId: [String, Number]
+    filmId: [String, Number],
+    detail: {
+      type: Object,
+      default: () => {}
+    }
   },
   methods: {
     chooseSeat(data) {
@@ -64,7 +68,8 @@ export default {
         params: {
           schedule: data.scheduleId,
           ticketList: [data.maxSalePrice, data.minSalePrice],
-          schedulesList: this.schedulesList
+          schedulesList: this.schedulesList,
+          detail: this.detail
         },
         query: {
           cinemaId: this.$route.params.cinemaId,
