@@ -1,10 +1,11 @@
 <template>
-  <van-pull-refresh
-    style="height: calc(100% - 44px)"
-    v-model="isLoading"
-    @refresh="onRefresh"
-  >
-    <div style="height: 100%;overflow: auto;" @scroll="handleScroll">
+  <div style="height: calc(100% - 44px)">
+    <van-pull-refresh
+      class="nowplaying"
+      v-model="isLoading"
+      @refresh="onRefresh"
+      @scroll.native="handleScroll"
+    >
       <film-list />
       <div
         v-if="
@@ -16,8 +17,8 @@
       >
         <span v-if="$store.state.film_list.length < 5">-无更多电影-</span>
       </div>
-    </div>
-  </van-pull-refresh>
+    </van-pull-refresh>
+  </div>
 </template>
 
 <script>
@@ -52,6 +53,12 @@ export default {
 </script>
 
 <style scoped lang="less">
+.nowplaying {
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
 .no-more-text {
   flex-grow: 1;
   background-color: #ededed;
